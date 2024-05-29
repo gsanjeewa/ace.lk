@@ -1,0 +1,12 @@
+<VirtualHost 192.168.8.10:80>
+	ServerName ace.lk
+	ServerAlias ace.lk
+	DocumentRoot "E:/ace.lk/"
+	<Directory  "E:/ace.lk/">
+		Options +Indexes +Includes +FollowSymLinks +MultiViews
+		AllowOverride All
+		Require all granted
+		Order allow,deny
+		allow from all
+	</Directory>
+</VirtualHost>
