@@ -784,7 +784,26 @@ foreach($result as $row_users)
               </li>
               <?php
               }
-
+              if (checkPermissions($_SESSION["user_id"], 11) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/dummy/d_emp_allowance" class="nav-link <?= ($second_part == 'd_emp_allowance') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-success"></i>
+                    <p>Employee Allowance</p>
+                  </a>
+                </li>
+                <?php
+              }
+              if (checkPermissions($_SESSION["user_id"], 9) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/dummy/d_add_emp_allowance" class="nav-link <?= ($second_part == 'd_add_emp_allowance') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-primary"></i>
+                    <p>Add Employee Allowance</p>
+                  </a>
+                </li>
+                <?php
+              }
               ?>             
             </ul>
           </li>

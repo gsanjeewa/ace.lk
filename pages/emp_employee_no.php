@@ -1762,4 +1762,48 @@ if($request == 25){
 	echo json_encode($output);
 }
 
+if($request == 26){
+	$output = array();
+	if(isset($_POST["effective_date"]) && $_POST["effective_date"] != '')
+	{	
+		$effective_date = date('Y-m-d', strtotime($_POST['effective_date']));
+		$query = "
+		SELECT j.employee_no, e.initial, e.surname, b.allowances_en, a.amount, a.id, t.position_abbreviation
+		FROM d_employee_allowances a
+		INNER JOIN d_allowances b ON a.allowances_id = b.allowances_id
+		INNER JOIN join_status j ON a.employee_id = j.join_id
+		INNER JOIN employee e ON j.employee_id = e.employee_id
+		INNER JOIN promotions c ON j.join_id=c.employee_id
+		INNER JOIN position t ON c.position_id=t.position_id
+		INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxid_pro
+		WHERE YEAR(a.effective_date)= YEAR('".$effective_date."') AND MONTH(a.effective_date) = MONTH('".$effective_date."')
+			";
+		if(isset($_POST["allowances_id"]) && $_POST["allowances_id"] != '')
+		{
+			$query .= " AND a.allowances_id='".$_POST["allowances_id"]."'";
+		}
+		$query .= " ORDER BY a.id DESC";
+
+			$statement = $connect->prepare($query);
+
+			$statement->execute();
+
+			$total_data = $statement->rowCount();
+
+			$result = $statement->fetchAll();
+			
+			foreach($result as $row)
+			{	
+				$output[] = array(
+					'emp_name'	 	 =>	$row['employee_no'].' '.$row['position_abbreviation'].' '.$row['initial'].' '.$row['surname'],
+					'allowance_name'	 =>	$row['allowances_en'],
+					'amount'	 =>	$row['amount'],								
+					'action'	 			 =>	'<form action="" method="POST"><input type="hidden" name="allowances_id" value="'.$row['id'].'"><button class="btn btn-sm btn-outline-danger" name="remove_allowances"  data-toggle="tooltip" data-placement="top" title="Delete" type="submit"><i class="fa fa-trash"></i></button></form>',
+				);			
+			}		
+
+	}
+	echo json_encode($output);
+}
+
 ?>

@@ -370,6 +370,16 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 
 				                    <?php
 				                	endif;
+				                	if ($row['arrears_payment'] > 0):
+				                    	?>
+				                    <tr>
+				                        <td width="73%">හිඟ ගෙවීම්</td>
+				                        <td width="2%" align="center">:</td>
+				                        <td width="25%" align="right"><?php echo number_format($row['arrears_payment'], 2)?></td> 
+				                    </tr>
+
+				                    <?php
+				                	endif;
 				                	?>
 				                    	                    
 								</table>

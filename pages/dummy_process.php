@@ -110,6 +110,14 @@ $delete_permision = array(
           $basic_salary = $basic_salary['basic_salary'];
         }
 
+//-----------------arrears payment------------------------//
+
+        $statement = $connect->prepare("SELECT COALESCE(sum(amount),'0') AS svc_amount FROM d_employee_allowances WHERE employee_id='".$employee_id."' AND (type='".$type."' OR (effective_date BETWEEN '".$date_from."' AND '".$date_to."')) AND allowances_id=1");
+        $statement->execute();
+        $result = $statement->fetchAll();
+        foreach($result as $arrears_payment){             
+          $arrears_payment=$arrears_payment['svc_amount'];
+      }
       //------------------shift type-----------------------//
       // $statement = $connect->prepare("SELECT shifts FROM d_shifts_rate a INNER JOIN d_attendance b ON a.department_id = b.department_id WHERE b.start_date = '".$date_from."' AND b.end_date = '".$date_to."' AND b.employee_id='".$employee_id."' AND (b.attendance_status=0 OR b.attendance_status=2) AND a.status=0 ORDER BY a.id DESC LIMIT 1");
       // $statement->execute();
@@ -420,7 +428,7 @@ $delete_permision = array(
 
         $incentive=(string)$total_amount-(string)$n_day_earning-(string)$poya_day_payment-(string)$m_payment-(string)$ot_payment-(string)$ot_t_payment;  
 
-        $gross=(string)$n_day_earning+(string)$poya_day_payment+(string)$m_payment+(string)$ot_payment+(string)$ot_t_payment+(string)$incentive+(string)$absent_amount+(string)$extra_ot_payment;
+        $gross=(string)$n_day_earning+(string)$poya_day_payment+(string)$m_payment+(string)$ot_payment+(string)$ot_t_payment+(string)$incentive+(string)$absent_amount+(string)$extra_ot_payment+(string)$arrears_payment;
 
         $total_deduction=(string)$epf_8+(string)$absent_amount+(string)$advance_amount+(string)$ration_amount;
 
@@ -465,6 +473,7 @@ $delete_permision = array(
       ':extra_ot_payment'   => $extra_ot_payment,
       ':incentive'          => $incentive,
       ':for_epf'            => $for_epf,
+      ':arrears_payment'    => $arrears_payment,
       ':gross'              => $gross,
       ':no_pay_days'        => $absent_day,
       ':no_pay'             => $absent_amount,
@@ -482,8 +491,8 @@ $delete_permision = array(
     );
 
     $query = "
-    INSERT INTO d_payroll_items(id, payroll_id, employee_id, employee_no, position_id, bank_id, department, basic_salary, no_of_shift, n_working_days, ot_hrs, poya_days, m_days, m_ot_hrs, h_days, h_ot_hrs, p_leave_days, n_day_earning, poya_day_payment, m_payment, p_leave_day_payment, ot_payment, ot_t_payment, extra_ot_hrs, extra_ot_payment, incentive, for_epf, gross, no_pay_days, no_pay, employee_epf, salary_advance, ration, hostel, fines, total_deductions, net_salary, employer_epf, employer_etf)
-    VALUES (:p_id, :payroll_id, :employee_id, :employee_no, :position_id, :bank_id, :department, :basic_salary, :no_of_shift, :n_working_days, :ot_hrs, :poya_days, :m_days, :m_ot_hrs, :h_days, :h_ot_hrs, :p_leave_days, :n_day_earning, :poya_day_payment, :m_payment, :p_leave_day_payment, :ot_payment, :ot_t_payment, :extra_ot_hrs, :extra_ot_payment, :incentive, :for_epf, :gross, :no_pay_days, :no_pay, :employee_epf, :salary_advance, :ration, :hostel, :fines, :total_deductions, :net_salary, :employer_epf, :employer_etf);
+    INSERT INTO d_payroll_items(id, payroll_id, employee_id, employee_no, position_id, bank_id, department, basic_salary, no_of_shift, n_working_days, ot_hrs, poya_days, m_days, m_ot_hrs, h_days, h_ot_hrs, p_leave_days, n_day_earning, poya_day_payment, m_payment, p_leave_day_payment, ot_payment, ot_t_payment, extra_ot_hrs, extra_ot_payment, incentive, for_epf, arrears_payment, gross, no_pay_days, no_pay, employee_epf, salary_advance, ration, hostel, fines, total_deductions, net_salary, employer_epf, employer_etf)
+    VALUES (:p_id, :payroll_id, :employee_id, :employee_no, :position_id, :bank_id, :department, :basic_salary, :no_of_shift, :n_working_days, :ot_hrs, :poya_days, :m_days, :m_ot_hrs, :h_days, :h_ot_hrs, :p_leave_days, :n_day_earning, :poya_day_payment, :m_payment, :p_leave_day_payment, :ot_payment, :ot_t_payment, :extra_ot_hrs, :extra_ot_payment, :incentive, :for_epf, :arrears_payment, :gross, :no_pay_days, :no_pay, :employee_epf, :salary_advance, :ration, :hostel, :fines, :total_deductions, :net_salary, :employer_epf, :employer_etf);
     UPDATE d_payroll SET status=:status WHERE id=:id;
     ";
   
