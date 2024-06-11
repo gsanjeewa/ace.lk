@@ -3,7 +3,7 @@
 include "config.php";
 $connect = pdoConnection();
 
-if(isset($_POST['effective_date']) && $_POST['effective_date'] != '') {
+if (isset($_POST['effective_date']) && $_POST['effective_date'] != '') {
     $effective_date = date("Y-m-d", strtotime($_POST['effective_date']));
     
     // Fetch all department details
@@ -24,7 +24,7 @@ if(isset($_POST['effective_date']) && $_POST['effective_date'] != '') {
     $data = [];
     $sno = 1;
 
-    foreach($departments as $dept) {
+    foreach ($departments as $dept) {
         $department_id = $dept['department_id'];
 
         // Fetch position details for each department
@@ -39,18 +39,18 @@ if(isset($_POST['effective_date']) && $_POST['effective_date'] != '') {
         $statement->execute([':effective_date' => $effective_date, ':department_id' => $department_id]);
         $positions = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        // Initialize variables for each position
+        // Initialize variables for each position with default values
         $positions_data = array_fill(1, 8, [
-            'to_be' => '', 'working' => '', 'shortfall' => '', 'invoice' => '', 'shortfall_amount' => '',
-            'actual_invoice' => '', 'invoice_amount' => '', 'working_rate' => ''
+            'to_be' => 0, 'working' => 0, 'shortfall' => 0, 'invoice' => 0, 'shortfall_amount' => 0,
+            'actual_invoice' => 0, 'invoice_amount' => 0, 'working_rate' => 0
         ]);
 
-        foreach($positions as $pos) {
+        foreach ($positions as $pos) {
             $position_id = $pos['position_id'];
-            $to_be = $pos['to_be_applied_shift'];
-            $working = $pos['working_shift'];
-            $invoice_rate = $pos['invoice_rate'];
-            $working_rate = $pos['working_rate'];
+            $to_be = $pos['to_be_applied_shift'] ?: 0;
+            $working = $pos['working_shift'] ?: 0;
+            $invoice_rate = $pos['invoice_rate'] ?: 0;
+            $working_rate = $pos['working_rate'] ?: 0;
             $actual_invoice = $to_be * $invoice_rate;
             $invoice_amount = $working * $invoice_rate;
             $shortfall = $to_be - $working;
@@ -58,22 +58,22 @@ if(isset($_POST['effective_date']) && $_POST['effective_date'] != '') {
             $positions_data[$position_id] = [
                 'to_be' => $to_be,
                 'working' => $working,
-                'shortfall' => $shortfall > 0 ? $shortfall : "({$shortfall})",
-                'invoice' => $shortfall > 0 ? $invoice_rate : '',
+                'shortfall' => $shortfall,
+                'invoice' => $shortfall > 0 ? $invoice_rate : 0,
                 'actual_invoice' => $actual_invoice,
                 'invoice_amount' => $invoice_amount,
-                'shortfall_amount' => $shortfall > 0 ? $shortfall * $invoice_rate : '',
+                'shortfall_amount' => $shortfall > 0 ? $shortfall * $invoice_rate : 0,
                 'working_rate' => $working_rate,
             ];
         }
 
         $total_actual_invoice = array_sum(array_column($positions_data, 'actual_invoice'));
         $total_invoice_amount = array_sum(array_column($positions_data, 'invoice_amount'));
-        $total_shortfall_amount = $total_actual_invoice - $total_invoice_amount;
+        $total_shortfall_amount = array_sum(array_column($positions_data, 'shortfall_amount'));
 
         $data[] = [
             $sno,
-            $dept['department_name'].'-'.$dept['department_location'],
+            $dept['department_name'] . '-' . $dept['department_location'],
             $positions_data[1]['to_be'],
             $positions_data[2]['to_be'],
             $positions_data[3]['to_be'],
