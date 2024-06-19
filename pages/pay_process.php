@@ -339,6 +339,19 @@ WHERE
           $total_shifts_any_emp_amount=0;
         }
 
+      //-----------------Shifts Allowance Details------------------------//
+
+      $statement = $connect->prepare("SELECT COALESCE(sum(a.no_of_shifts * b.allowance),'0') AS total_amount FROM attendance a INNER JOIN shifts_allowance_institute b ON a.department_id = b.department_id AND a.position_id=b.position_id WHERE a.start_date = '".$date_from."' AND a.end_date = '".$date_to."' AND a.employee_id='".$employee_id."' AND (a.attendance_status=0 OR a.attendance_status=2) AND b.status=0 AND b.total_shifts <= '".$total_shifts."' ORDER BY b.id DESC LIMIT 1");    
+
+      $statement->execute();
+      $result = $statement->fetchAll();
+      foreach($result as $row_shifts_institute){
+
+        $shifts_allowance_institute=$row_shifts_institute['total_amount'];
+        
+      }
+
+
       //-----------------Promotion Pay Details------------------------//
 
       $statement = $connect->prepare("SELECT promotion_pay FROM promotions WHERE employee_id='".$employee_id."' ORDER BY id DESC LIMIT 1");
@@ -354,7 +367,7 @@ WHERE
           $total_promotion_pay=0;
         }
         
-        $total_service_allowance=(string)$total_promotion_pay+(string)$service_allowance+(string)$shifts_allowance_amount+(string)$shifts_allowance_emp_amount+(string)$total_shifts_any_emp_amount;
+        $total_service_allowance=(string)$total_promotion_pay+(string)$service_allowance+(string)$shifts_allowance_amount+(string)$shifts_allowance_emp_amount+(string)$total_shifts_any_emp_amount+(string)$shifts_allowance_institute;
 
       //-----------------Rewards Allowance Details------------------------//
 

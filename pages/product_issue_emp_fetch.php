@@ -46,6 +46,9 @@ foreach($result as $row)
 	}
 
 	if ($row["status"]==1) {
+		$action ='<form method="POST" target="_blank" action="/inventory/invoice_print"><input type="hidden" name="invoice_id" value="'.$row["id"].'"><button class="btn btn-xs btn-outline-primary float-right"><i class="fas fa-print"></i></button></form><a href="/inventory/deduction/'.$row["id"].'" class="btn btn-xs btn-outline-warning" data-toggle="tooltip" data-placement="left" title="Deduction"><i class="fa fa-plus"></i></a>';
+		
+	}elseif($row["status"]==1){
 		$action='<form method="POST" target="_blank" action="/inventory/invoice_print"><input type="hidden" name="invoice_id" value="'.$row["id"].'"><button class="btn btn-xs btn-outline-primary float-right"><i class="fas fa-print"></i></button></form>';
 	}else{
 		$action='<a href="/inventory/issue_product/'.$row["id"].'" class="btn btn-xs btn-outline-success" data-toggle="tooltip" data-placement="left" title="Add List"><i class="fa fa-plus"></i></a>';

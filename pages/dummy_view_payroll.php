@@ -150,6 +150,7 @@ include '../inc/header.php';
         <th>Over Time x (3)</th>
         <th>Performance Incentive</th>
         <th>For EPF</th>
+        <th>Arrears Payment</th>
         <th>Gross Salary</th>
         <th>Employee EPF (8%)</th>
         <th>No Pay Days</th>

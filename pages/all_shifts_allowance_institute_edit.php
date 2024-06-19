@@ -18,7 +18,7 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
     if(isset($_POST['edit_id4']))
     {
         $eid=$_POST['edit_id4'];
-        $sql2="SELECT * from d_shifts_rate where id=:eid";
+        $sql2="SELECT * from shifts_allowance_institute where id=:eid";
         $query2 = $connect -> prepare($sql2);
         $query2-> bindParam(':eid', $eid, PDO::PARAM_STR);
         $query2->execute();
@@ -36,9 +36,9 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                         <div class="form-group col-md-12">
                             <label class="col-sm-12 pl-0 pr-0">Institution Name</label>
                             <div class="col-sm-12 pl-0 pr-0">
-                                <select class="form-control select2" style="width: 100%;" name="department_id" id="department_id">
+                                <select class="form-control select2" style="width: 100%;" name="department_id" id="department_id" >
                                    <?php
-                                    $query="SELECT * FROM department ORDER BY department_id";
+                                    $query="SELECT * FROM department ORDER BY department_name ASC";
                                     $statement = $connect->prepare($query);
                                     $statement->execute();
                                     $result = $statement->fetchAll();
@@ -56,17 +56,40 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                     
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label class="col-sm-12 pl-0 pr-0">Shifts</label>
+                            <label class="col-sm-12 pl-0 pr-0">Position Name</label>
                             <div class="col-sm-12 pl-0 pr-0">
-                                <select class="form-control select2" style="width: 100%;" name="shifts" id="shifts">
-                            <option value="">Select Type</option>
-                            <option value="1"<?php if ($row->shifts==1){ echo "SELECTED";}?>>Nomal Rate not included Half Days</option>
-                            <option value="2"<?php if ($row->shifts==2){ echo "SELECTED";}?>>Nomal Rate included Half Days</option>
-                            <option value="3"<?php if ($row->shifts==3){ echo "SELECTED";}?>>20 Rate not included Half Days</option>
-                            <option value="4"<?php if ($row->shifts==4){ echo "SELECTED";}?>>Nomal Rate included Half Days, Poya & Mercantile </option>
-                            <option value="5"<?php if ($row->shifts==5){ echo "SELECTED";}?>>Total shifts</option>
-                            <option value="6"<?php if ($row->shifts==6){ echo "SELECTED";}?>>Nomal Rate Max OT 60 & included Half Days</option>
-                        </select>
+                                <select class="form-control select2" style="width: 100%;" name="position_id" id="position_id" >
+                                   <?php
+                                    $query="SELECT * FROM position ORDER BY priority ASC";
+                                    $statement = $connect->prepare($query);
+                                    $statement->execute();
+                                    $result = $statement->fetchAll();
+                                    foreach($result as $row_position)
+                                    {
+                                      ?>
+                                      <option value="<?php echo $row_position['position_id']; ?>"<?php if ($row_position['position_id']==$row->position_id){ echo "SELECTED";}?>><?php echo $row_position['position_abbreviation']; ?></option>
+                                      <?php
+                                    }
+                                    ?>
+                                </select>                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-12 pl-0 pr-0">Shifts Allowance</label>
+                            <div class="col-sm-12 pl-0 pr-0">
+                                <input type="text" name="allowance" value="<?php  echo $row->allowance;?>" class="form-control" id="allowance">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-12 pl-0 pr-0">Total Shifts</label>
+                            <div class="col-sm-12 pl-0 pr-0">
+                                <input type="text" name="total_shifts" class="form-control" id="total_shifts" value="<?php  echo $row->total_shifts;?>">
                             </div>
                         </div>
                     </div>
@@ -85,7 +108,7 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                     <div class="col-sm-12 pl-0 pr-0">
                         <select class="form-control select2" style="width: 100%;" name="department_id" id="department_id">
                             <?php
-                            $query="SELECT * FROM department ORDER BY department_id";
+                            $query="SELECT * FROM department ORDER BY department_name ASC";
                             $statement = $connect->prepare($query);
                             $statement->execute();
                             $result = $statement->fetchAll();
@@ -102,18 +125,41 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
             </div>
 
             <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-12 pl-0 pr-0">Position Name</label>
+                            <div class="col-sm-12 pl-0 pr-0">
+                                <select class="form-control select2" style="width: 100%;" name="position_id[]" id="position_id" multiple="multiple">
+                                   <?php 
+                                    $query="SELECT * FROM position ORDER BY priority ASC";
+                                    $statement = $connect->prepare($query);
+                                    $statement->execute();
+                                    $result = $statement->fetchAll();
+                                    foreach($result as $row_position)
+                                    {
+                                      ?>
+                                      <option value="<?php echo $row_position['position_id']; ?>"><?php echo $row_position['position_abbreviation']; ?></option>
+                                      <?php
+                                    }
+                                    ?>
+                                </select>                                
+                            </div>
+                        </div>
+                    </div>
+
+            <div class="row">
                 <div class="form-group col-md-12">
-                    <label class="col-sm-12 pl-0 pr-0">Shifts Type</label>
+                    <label class="col-sm-12 pl-0 pr-0">Shifts Allowance</label>
                     <div class="col-sm-12 pl-0 pr-0">
-                        <select class="form-control select2" style="width: 100%;" name="shifts" id="shifts">
-                            <option value="">Select Type</option>
-                            <option value="1">Nomal Rate not included Half Days</option>
-                            <option value="2">Nomal Rate included Half Days</option>
-                            <option value="3">20 Rate not included Half Days</option>
-                            <option value="4">Nomal Rate included Half Days, Poya & Mercantile</option>
-                            <option value="5">Total shifts</option>
-                            <option value="6">Nomal Rate Max OT 60 & included Half Days</option>
-                        </select>
+                        <input type="text" name="allowance" class="form-control" id="allowance">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-12">
+                    <label class="col-sm-12 pl-0 pr-0">Total Shifts</label>
+                    <div class="col-sm-12 pl-0 pr-0">
+                        <input type="text" name="total_shifts" class="form-control" id="total_shifts">
                     </div>
                 </div>
             </div>
@@ -132,7 +178,10 @@ $(function () {
   
   $('#add_bank_form').validate({
     rules: {
-      sector_name: { required: true},      
+      allowance: { required: true, number: true},
+      department_id: { required: true},
+      position_id: { required: true},
+      total_shifts: { required: true, number: true},      
     },
 
     messages: {      

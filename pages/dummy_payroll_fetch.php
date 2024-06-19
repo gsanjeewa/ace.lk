@@ -123,6 +123,8 @@ if ($row['m_ot_hrs'] !=0) : $m_ot_hrs = number_format($row['m_ot_hrs'],2); else:
 
  if ($row['for_epf'] !=0) :$for_epf = number_format($row['for_epf'],2); else: $for_epf=''; endif;
 
+ if ($row['arrears_payment'] !=0) :$arrears_payment = number_format($row['arrears_payment'],2); else: $arrears_payment=''; endif;
+
  if ($row['gross'] !=0) :$gross = number_format($row['gross'],2); else: $gross=''; endif;
 
  if ($row['employee_epf'] !=0) :$employee_epf = number_format($row['employee_epf'],2); else: $employee_epf=''; endif;
@@ -177,6 +179,7 @@ $braii=number_format(1000,2);
  $sub_array[] = $ot_t_payment;
  $sub_array[] = $incentive;
  $sub_array[] = $for_epf;
+ $sub_array[] = $arrears_payment;
  $sub_array[] = $gross;
  $sub_array[] = $employee_epf;
  $sub_array[] = $no_pay_days;

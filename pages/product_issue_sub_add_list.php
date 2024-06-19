@@ -23,6 +23,12 @@ if (isset($_POST['add_save'])){
     exit();
   }
 
+  if ($_POST['aval_stock']<$_POST['qty'] ):
+    $error = true;
+    $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button>More than available qty.</div>';
+  endif;
+  
+
   $statement = $connect->prepare("SELECT id FROM inventory_stock ORDER BY id DESC LIMIT 1");
     $statement->execute();
     $result = $statement->fetchAll();
@@ -58,37 +64,39 @@ if (isset($_POST['add_save'])){
 
   $total=$_POST['qty']*$_POST['unit_price'];
 
-  $data = array(
-    ':id'         =>  $sno,
-    ':loc_invoice_id' =>  $_GET['invoice_id'],
-    ':product_id' =>  $_POST['product'],
-    ':size'       =>  $size,
-    ':color'      =>  $color,
-    ':gender'     =>  $gender,
-    ':qty'        =>  $_POST['qty'],
-    ':unit_price' =>  $_POST['unit_price'],
-    ':total'      =>  $total,
-    ':status'     =>  4,
-    ':location_id'=>  $_POST['location_id'],
-    ':sub_location_id'=>  $_POST['sub_location_id'],
-  );
- 
-  $query = "
-  INSERT INTO inventory_stock(id, product_id, size, color, gender, location_id, sub_location_id, qty, unit_price, status, loc_invoice_id, total)
-  VALUES (:id, :product_id, :size, :color, :gender, :location_id, :sub_location_id, :qty, :unit_price, :status, :loc_invoice_id, :total)
-  ";
-          
-  $statement = $connect->prepare($query);
+  if(!$error):
+    $data = array(
+      ':id'         =>  $sno,
+      ':loc_invoice_id' =>  $_GET['invoice_id'],
+      ':product_id' =>  $_POST['product'],
+      ':size'       =>  $size,
+      ':color'      =>  $color,
+      ':gender'     =>  $gender,
+      ':qty'        =>  $_POST['qty'],
+      ':unit_price' =>  $_POST['unit_price'],
+      ':total'      =>  $total,
+      ':status'     =>  2,
+      ':location_id'=>  $_POST['location_id'],
+      ':sub_location_id'=>  $_POST['sub_location_id'],
+    );
+  
+    $query = "
+    INSERT INTO inventory_stock(id, product_id, size, color, gender, location_id, sub_location_id, qty, unit_price, status, loc_invoice_id, total)
+    VALUES (:id, :product_id, :size, :color, :gender, :location_id, :sub_location_id, :qty, :unit_price, :status, :loc_invoice_id, :total)
+    ";
+            
+    $statement = $connect->prepare($query);
 
-  if($statement->execute($data))
-  {
-    $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';    
+    if($statement->execute($data))
+    {
+      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';    
 
-  }else{
-      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
-  }
+    }else{
+        $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
+    }
+  endif;
 }
 
 if (isset($_POST['update_save'])){
@@ -109,13 +117,13 @@ if (isset($_POST['update_save'])){
 // }
     
       $data = array(
-        ':id'     =>  $_GET['invoice_id'],
-        ':grand_total'     =>  $_POST['grand_total'],
-        ':status' =>  1,
+        ':id'           =>  $_GET['invoice_id'],
+        ':grand_total'  =>  $_POST['grand_total'],
+        ':status'       =>  1,
       );
 
       $query = "
-      UPDATE inventory_create_invoice SET grand_total=:grand_total, status=:status WHERE id=:id    
+      UPDATE inventory_create_invoice_loc SET grand_total=:grand_total, status=:status WHERE id=:id    
       ";
         
       $statement = $connect->prepare($query);
@@ -125,10 +133,10 @@ if (isset($_POST['update_save'])){
         $errMSG = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';
-        header('location:/inventory/issue_product');
+        header('location:/inventory/issue_sub_loc');
       }else{
         $errMSG = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
-        header('location:/inventory/issue_product/'.$_GET['invoice_id'].'');
+        header('location:/inventory/issue_sub_loc/'.$_GET['invoice_id'].'');
       }
     }  
 
@@ -489,7 +497,7 @@ $(function () {
   $.ajax({
     url:"/fetch_issue",
     method:"POST",
-    data:{invoice_id:invoice_id, request:2},
+    data:{invoice_id:invoice_id, request:3},
     dataType: 'json',
 
     success:function(response)

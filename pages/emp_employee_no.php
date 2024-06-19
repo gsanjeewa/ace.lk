@@ -1762,4 +1762,125 @@ if($request == 25){
 	echo json_encode($output);
 }
 
+if($request == 26){
+	$output = array();
+	if(isset($_POST["effective_date"]) && $_POST["effective_date"] != '')
+	{	
+		$effective_date = date('Y-m-d', strtotime($_POST['effective_date']));
+		$query = "
+		SELECT j.employee_no, e.initial, e.surname, b.allowances_en, a.amount, a.id, t.position_abbreviation
+		FROM d_employee_allowances a
+		INNER JOIN d_allowances b ON a.allowances_id = b.allowances_id
+		INNER JOIN join_status j ON a.employee_id = j.join_id
+		INNER JOIN employee e ON j.employee_id = e.employee_id
+		INNER JOIN promotions c ON j.join_id=c.employee_id
+		INNER JOIN position t ON c.position_id=t.position_id
+		INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxid_pro
+		WHERE YEAR(a.effective_date)= YEAR('".$effective_date."') AND MONTH(a.effective_date) = MONTH('".$effective_date."')
+			";
+		if(isset($_POST["allowances_id"]) && $_POST["allowances_id"] != '')
+		{
+			$query .= " AND a.allowances_id='".$_POST["allowances_id"]."'";
+		}
+		$query .= " ORDER BY a.id DESC";
+
+			$statement = $connect->prepare($query);
+
+			$statement->execute();
+
+			$total_data = $statement->rowCount();
+
+			$result = $statement->fetchAll();
+			
+			foreach($result as $row)
+			{	
+				$output[] = array(
+					'emp_name'	 	 =>	$row['employee_no'].' '.$row['position_abbreviation'].' '.$row['initial'].' '.$row['surname'],
+					'allowance_name'	 =>	$row['allowances_en'],
+					'amount'	 =>	$row['amount'],								
+					'action'	 			 =>	'<form action="" method="POST"><input type="hidden" name="allowances_id" value="'.$row['id'].'"><button class="btn btn-sm btn-outline-danger" name="remove_allowances"  data-toggle="tooltip" data-placement="top" title="Delete" type="submit"><i class="fa fa-trash"></i></button></form>',
+				);			
+			}		
+
+	}
+	echo json_encode($output);
+}
+
+if($request == 27){
+	$output_allowance = array();
+	if(isset($_POST["employee_id"]) && !empty($_POST["employee_id"]))
+	{			
+		
+		$query = "
+		SELECT c.due_date, c.amount 
+		FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id
+		INNER JOIN (SELECT employee_id, MAX(join_id) maxid FROM join_status GROUP BY employee_id) b ON j.employee_id = b.employee_id AND j.join_id = b.maxid 
+		INNER JOIN inventory_deduction c ON j.join_id=c.employee_id 
+		WHERE status=0 AND j.join_id='".$_POST["employee_id"]."'
+		";
+	
+		$statement = $connect->prepare($query);
+
+		$statement->execute();
+
+		$total_data = $statement->rowCount();
+
+		$result = $statement->fetchAll();
+		
+		foreach($result as $row)
+		{
+			$output_allowance[] = array(
+				'due_date'	=>	 date('Y F', strtotime($row['due_date'])),
+				'amount'	 	=>	 number_format($row['amount'], 2)				
+			);			
+		}
+		
+
+	}
+
+	echo json_encode($output_allowance);
+}
+
+if($request == 28){
+	$output = array();
+	
+	if((isset($_POST["employee_id"]) && $_POST["employee_id"] != '') && (isset($_POST["invoice_id"]) && $_POST["invoice_id"] != ''))
+	{	
+		$query = "
+		SELECT e.initial, e.surname, j.employee_no, a.due_date, a.amount, a.employee_id, c.position_id, t.position_abbreviation
+		FROM inventory_deduction a
+		INNER JOIN join_status j ON a.employee_id = j.join_id
+		INNER JOIN employee e ON j.employee_id = e.employee_id
+		INNER JOIN promotions c ON j.join_id=c.employee_id 
+		INNER JOIN position t ON c.position_id=t.position_id
+		INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxid_pro
+		WHERE a.status=0 AND a.invoice_id='".$_POST["invoice_id"]."' AND a.employee_id='".$_POST["employee_id"]."' ORDER BY a.id DESC
+
+			";
+
+			$statement = $connect->prepare($query);
+
+			$statement->execute();
+
+			$total_data = $statement->rowCount();
+
+			$result = $statement->fetchAll();
+			
+			foreach($result as $row)
+			{	
+				$ded='<ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item"><b>'.$row['due_date'].'</b> <a class="float-right">'.$row['amount'].'</a></li></ul>';
+
+				$output[] = array(
+					'emp_name'	 	 =>	$row['employee_no'].' '.$row['position_abbreviation'].' '.$row['initial'].' '.$row['surname'],
+					'due_date'	 =>	date('Y F', strtotime($row['due_date'])),
+					'amount'	 =>	$row['amount'],
+				);
+							
+			}		
+}
+	
+	echo json_encode($output);
+}
+
 ?>

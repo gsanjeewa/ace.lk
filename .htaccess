@@ -172,6 +172,8 @@ RewriteRule ^create_invoice$ pages/product_create_invoice_emp.php [NC,L]
 RewriteRule ^inventory/issue_sub_loc/([-\w]+)$ pages/product_issue_sub_add_list.php?invoice_id=$1 [NC,L]
 RewriteRule ^inventory/invoice_sub_print$ pages/product_invoice_sub_print.php [NC,L]
 
+RewriteRule ^inventory/deduction/([-\w]+)$ pages/product_deduction_emp.php?edit=$1 [NC,L]
+
 #Reports
 RewriteRule ^reports/payroll_list/payrolls$ pages/reports_payroll.php [NC,L]
 RewriteRule ^reports_payroll_fetch$ pages/reports_payroll_fetch.php [NC,L]
@@ -260,6 +262,10 @@ RewriteRule ^edit_d_position_pay$ pages/dummy_position_pay_edit.php [NC,L]
 RewriteRule ^dummy/payroll_print_depatment$ pages/dummy_payroll_print_depatment.php [NC,L]
 RewriteRule ^dummy/d_ins_merge$ pages/dummy_institute_merge.php [NC,L]
 RewriteRule ^ins_backend-script$ pages/dummy_ins_backend-script.php [NC,L]
+RewriteRule ^dummy/d_emp_allowance$ pages/dummy_emp_allowances.php [NC,L]
+RewriteRule ^dummy/d_add_emp_allowance$ pages/dummy_add_emp_allowance.php [NC,L]
+
+
 
 #Death
 RewriteRule ^death/death_list$ pages/death_list.php [NC,L]

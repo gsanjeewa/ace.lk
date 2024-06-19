@@ -87,6 +87,7 @@ include '../inc/header.php';
           <?php
           }   
 
+         
 // $statement = $connect->prepare("SELECT date_from, date_to, type FROM payroll WHERE id =2");
 //     $statement->execute();
 //     $result = $statement->fetchAll();
