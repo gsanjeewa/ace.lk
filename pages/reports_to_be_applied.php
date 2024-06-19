@@ -214,27 +214,27 @@ include '../inc/footer.php';
       }
    ],
     "columnDefs": [
-        {"className": "dt-center", "targets": "_all"},
-        {"className": "dt-right", "targets": [4]},
-      ]
+      {"className": "dt-center", "targets": "_all"},
+      {"className": "dt-right", "targets": [4]},
+    ]
    
    });
   }
   
   $('#filter').click(function(){
-   var effective_date = $('#effective_date').val();   
-   if(effective_date != '')
-   {
-    $('#customer_data').DataTable().destroy();
-    fill_datatable(effective_date);
-   }
-   else
-   {
-    alert('Select Both filter option');
-    $('#customer_data').DataTable().destroy();
-    fill_datatable();
-   }
-  });  
+    var effective_date = $('#effective_date').val();   
+    if(effective_date != '')
+    {
+      $('#customer_data').DataTable().destroy();
+      fill_datatable(effective_date);
+    }
+    else
+    {
+      alert('Select Both filter option');
+      $('#customer_data').DataTable().destroy();
+      fill_datatable();
+    }
+  });
   
  });
  
