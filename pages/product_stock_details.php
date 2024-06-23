@@ -13,7 +13,7 @@ if (checkPermissions($_SESSION["user_id"], 67) == "false") {
     exit();
 }
 
-$query_location = "SELECT location FROM inventory_location WHERE id='".$_GET['location_id']."'";
+$query_location = "SELECT location, type, id FROM inventory_location WHERE id='".$_GET['location_id']."'";
 $statement = $connect->prepare($query_location);
 $statement->execute();
 $result_location = $statement->fetchAll();
@@ -22,7 +22,7 @@ foreach($result_location as $row_location)
  
 }
 
-$query_product = "SELECT product_name FROM inventory_product WHERE id='".$_GET['product_id']."'";
+$query_product = "SELECT product_name, id FROM inventory_product WHERE id='".$_GET['product_id']."'";
 $statement = $connect->prepare($query_product);
 $statement->execute();
 $result_product = $statement->fetchAll();
@@ -104,114 +104,106 @@ include '../inc/header.php';
                   <!-- /.card-header -->
                 <div class="card-body">  
 
-                  <table id="example2" class="table table-bordered table-striped table-sm">
+                <?php
+                $query_loc = 'SELECT * FROM inventory_location ORDER BY type ASC';
+                $statement = $connect->prepare($query_loc);
+                $statement->execute();
+                $result_loc = $statement->fetchAll();
+
+                $query = 'SELECT * FROM inventory_stock WHERE product_id= :product_id';
+                if ($row_location['type'] == 1) {
+                    $query .= ' AND location_id= :location_id';
+                } elseif ($row_location['type'] == 2) {
+                    $query .= ' AND sub_location_id= :location_id';
+                }
+                $query .= ' GROUP BY product_id, size, color, gender';
+
+                $statement = $connect->prepare($query);
+                $statement->execute([
+                    ':product_id' => $_GET['product_id'],
+                    ':location_id' => $_GET['location_id']
+                ]);
+                $result = $statement->fetchAll();
+                ?>
+
+                <table id="example2" class="table table-bordered table-striped table-sm">
                     <thead style="text-align: center;">
-                      <tr>
-                        <th>#</th>                        
-                        <th>Product</th>                        
-                        <th>Qty</th>                                                          
-                      </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                        </tr>
                     </thead>
                     <tbody>
-                      <?php
-                      $query = 'SELECT * FROM inventory_product ORDER BY id ASC';
-
-                      $statement = $connect->prepare($query);
-                      $statement->execute();
-                      $total_data = $statement->rowCount();
-
-                      $result = $statement->fetchAll();
-
-                      $startpoint =0;
-                      $sno = $startpoint + 1;
-                      foreach($result as $row)
-                      {                                               
-
-                        ?>
-                        <tr>
-                            <td><center><?php echo $sno; ?></center></td>
-                            <td><center><?php echo $row['product_name'];?></center></td>
-                            <?php 
-                            foreach($result_loc as $row_loc)
-                            {
-
-                              if ($row_loc['type']==1) {
-                                $statement = $connect->prepare("SELECT sum(qty) AS total_qty FROM inventory_stock WHERE product_id='".$row['id']."' AND status=1 AND location_id='".$row_loc['id']."'");
-                                $statement->execute();
-                                $result = $statement->fetchAll();
-                                foreach($result as $product_qty){             
-                                  $product_qty=$product_qty['total_qty'];
-                                }
-
-                                $statement = $connect->prepare("SELECT sum(qty) AS total_qty FROM inventory_stock WHERE product_id='".$row['id']."' AND status=2 AND location_id='".$row_loc['id']."'");
-                                $statement->execute();
-                                $result = $statement->fetchAll();
-                                foreach($result as $issue_sub_loc){             
-                                  $issue_sub_loc=$issue_sub_loc['total_qty'];
-                                }
-
-                                $statement = $connect->prepare("SELECT sum(qty) AS total_qty FROM inventory_stock WHERE product_id='".$row['id']."' AND status=4 AND location_id='".$row_loc['id']."'");
-                                $statement->execute();
-                                $result = $statement->fetchAll();
-                                foreach($result as $issue_emp){             
-                                  $issue_emp=$issue_emp['total_qty'];
-                                }
-
-                                if ((int)$product_qty-(int)$issue_emp-(int)$issue_sub_loc>0) {
-                                  $qty=(int)$product_qty-(int)$issue_emp-(int)$issue_sub_loc;
-                                }else{
-                                  $qty='';
-                                }
-
-                                ?>
-                                <td><center><a href="/inventory/stock/<?php echo $row_loc['id']?>/<?php echo $row['id']; ?>"><?php echo $qty; ?></a></center></td>
-                                <?php
-
-                              }elseif ($row_loc['type']==2) {
-                                
-                                $statement = $connect->prepare("SELECT sum(qty) AS total_qty FROM inventory_stock WHERE product_id='".$row['id']."' AND status=2 AND sub_location_id='".$row_loc['id']."'");
-                                $statement->execute();
-                                $result = $statement->fetchAll();
-                                foreach($result as $issue_sub_loc){             
-                                  $issue_sub_loc=$issue_sub_loc['total_qty'];
-                                }
-
-                                $statement = $connect->prepare("SELECT sum(qty) AS total_qty FROM inventory_stock WHERE product_id='".$row['id']."' AND status=4 AND sub_location_id='".$row_loc['id']."'");
-                                $statement->execute();
-                                $result = $statement->fetchAll();
-                                foreach($result as $issue_emp){             
-                                  $issue_emp=$issue_emp['total_qty'];
-                                }
-
-                                $sub_total=array();
-
-                                if ((int)$issue_sub_loc-(int)$issue_emp>0) {
-                                  $qty_sub=(int)$issue_sub_loc-(int)$issue_emp;
-                                  $sub_total[]=(int)$issue_sub_loc-(int)$issue_emp;
-                                }else{
-                                  $qty_sub='';
-                                }
-                                ?>
-                                <td><center><a href="/inventory/stock/<?php echo $row_loc['id']?>/<?php echo $row['id']; ?>"><?php echo $qty_sub; ?></a></center></td>
-                                <?php
-                              }
-                              
-                            }
-                            
-                            if ((int)$qty+(int)$qty_sub>0) {
-                                $sum=(int)$qty+(int)$qty_sub;
-                              }else{
-                                $sum='';
-                              }
-                            ?>
-                            <td><center><?php echo $sum;?></center></td>
-                        </tr>
                         <?php
-                        $sno ++;
-                      }
-                      ?>
+                        $sno = 1;
+                        foreach ($result as $row) {
+                            $total_qty = 0; // Initialize total quantity for each product variation
+                            
+                            // Fetch color
+                            $query_color = "SELECT color FROM inventory_color WHERE id= :color_id";
+                            $statement = $connect->prepare($query_color);
+                            $statement->execute([':color_id' => $row['color']]);
+                            $row_color = $statement->fetch();
+                            $color = $row_color && $row_color['color'] != 'No' ? $row_color['color'] : '';
+
+                            // Fetch gender
+                            $query_gender = "SELECT gender FROM inventory_gender WHERE id= :gender_id";
+                            $statement = $connect->prepare($query_gender);
+                            $statement->execute([':gender_id' => $row['gender']]);
+                            $row_gender = $statement->fetch();
+                            $gender = $row_gender && $row_gender['gender'] != 'No' ? $row_gender['gender'] : '';
+
+                            // Calculate quantity
+                            $product_qty = $sub_loc_issue = $sub_loc_stock = $emp_qty = 0;
+
+                            // Query for each status
+                            $status_queries = [
+                                'product_qty' => ['status' => 1, 'location_id' => true],
+                                'sub_loc_issue' => ['status' => 2, 'location_id' => true],
+                                'sub_loc_stock' => ['status' => 2, 'sub_location_id' => true],
+                                'emp_qty' => ['status' => 4, 'location_id' => true]
+                            ];
+
+                            foreach ($status_queries as $var_name => $query_info) {
+                                $query = "SELECT SUM(qty) AS total_qty FROM inventory_stock WHERE product_id = :product_id AND status = :status AND size = :size AND color = :color AND gender = :gender";
+                                $params = [
+                                    ':product_id' => $_GET['product_id'],
+                                    ':status' => $query_info['status'],
+                                    ':size' => $row['size'],
+                                    ':color' => $row['color'],
+                                    ':gender' => $row['gender']
+                                ];
+                                if (isset($query_info['location_id'])) {
+                                    $query .= " AND location_id = :location_id";
+                                    $params[':location_id'] = $_GET['location_id'];
+                                }
+                                if (isset($query_info['sub_location_id'])) {
+                                    $query .= " AND sub_location_id = :sub_location_id";
+                                    $params[':sub_location_id'] = $_GET['location_id'];
+                                }
+                                $statement = $connect->prepare($query);
+                                $statement->execute($params);
+                                ${$var_name} = $statement->fetchColumn();
+                            }
+
+                            $qty = (int)$product_qty + (int)$sub_loc_stock - (int)$sub_loc_issue - (int)$emp_qty;
+                            $total_qty += $qty; // Accumulate the quantity for total
+
+                            ?>
+                            <tr>
+                                <td><center><?php echo $sno; ?></center></td>
+                                <td><?php echo $row['size'] . ' ' . $color . ' ' . $gender; ?></td>
+                                <td><center><?php echo $qty > 0 ? $qty : ''; ?></center></td>
+                            </tr>
+                            <?php
+                            $sno++;
+                        }
+                        ?>
                     </tbody>
-                  </table>
+                </table>
+
+
                 </div>
                 <!-- /.card-body -->
               </div>
