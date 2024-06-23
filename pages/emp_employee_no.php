@@ -1806,7 +1806,6 @@ if($request == 26){
 	echo json_encode($output);
 }
 
-<<<<<<< HEAD
 if($request == 27){
 	$output_allowance = array();
 	if(isset($_POST["employee_id"]) && !empty($_POST["employee_id"]))
@@ -1884,6 +1883,5 @@ if($request == 28){
 	echo json_encode($output);
 }
 
-=======
->>>>>>> 08f91d581744dab49d061acd6c157c7ff04cd157
+
 ?>

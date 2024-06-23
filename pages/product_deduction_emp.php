@@ -14,12 +14,13 @@ if (checkPermissions($_SESSION["user_id"], 91) == "false") {
 
 $error = false;
 
-if (isset($_POST['add_save'])) {
+if (isset($_POST['add_save'])){
 
   if (checkPermissions($_SESSION["user_id"], 91) == "false") {
-      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>';
-      header('location:/dashboard');
-      exit();
+
+    $_SESSION["msg"] ='<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>';  
+    header('location:/dashboard');  
+    exit();
   }
 
   $star_dates = array();
@@ -30,8 +31,8 @@ if (isset($_POST['add_save'])) {
   // Create the start date object from the effective date
   $start = new DateTime($_POST['date_effective']);
 
-  // Insert the first installment if provided
   if (!empty($_POST['first_ins'])) {
+      // Insert the first installment into the database using the effective date
       $data = array(
           ':employee_id' => $_POST['employee_id'],
           ':monthly_ins' => $_POST['first_ins'],
@@ -51,48 +52,47 @@ if (isset($_POST['add_save'])) {
           $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Cannot save first installment.</div>';
       }
 
-      // Move to the next month for the subsequent installment(s)
+      // Move to the next month for subsequent installments
       $start->add(new DateInterval('P1M'));
-      $total_months--; // Decrease the total months as we have already inserted the first installment
   }
 
-  if ($total_months > 0) {
-      // Generate dates for the remaining months
-      $interval = DateInterval::createFromDateString('1 month');
-      $period = new DatePeriod($start, $interval, $total_months);
+  if ($total_months > 1) {
+  // Generate dates for the remaining months
+  $interval = DateInterval::createFromDateString('1 month');
+  $period = new DatePeriod($start, $interval, $total_months - 1); // total_months - 1 if first_ins is set
 
-      foreach ($period as $dt) {
-          $star_dates[] = $dt->format("Y-m-d");
-      }
-
-      // Insert the remaining installments into the database
-      foreach ($star_dates as $due_date) {
-          $data = array(
-              ':employee_id' => $_POST['employee_id'],
-              ':monthly_ins' => $_POST['monthly_ins'],
-              ':due_date' => $due_date,
-              ':invoice_id' => $_GET['edit'],
-              ':status' => 0,
-          );
-
-          $query = "
-              INSERT INTO inventory_deduction(employee_id, due_date, amount, status, invoice_id)
-              VALUES (:employee_id, :due_date, :monthly_ins, :status, :invoice_id)
-          ";
-          $statement = $connect->prepare($query);
-
-          if ($statement->execute($data)) {
-              $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button>
-              <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';
-          } else {
-              $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Cannot save.</div>';
-          }
-      }
+  foreach ($period as $dt) {
+      $star_dates[] = $dt->format("Y-m-d");
   }
 
-  // Redirect after processing
-  header('Location: /inventory/deduction/' . $_GET['edit']);
-  exit;
+  // Insert the remaining installments into the database
+  foreach ($star_dates as $due_date) {
+      $data = array(
+          ':employee_id' => $_POST['employee_id'],
+          ':monthly_ins' => $_POST['monthly_ins'],
+          ':due_date' => $due_date,
+          ':invoice_id' => $_GET['edit'],
+          ':status' => 0,
+      );
+
+      $query = "
+          INSERT INTO inventory_deduction(employee_id, due_date, amount, status, invoice_id)
+          VALUES (:employee_id, :due_date, :monthly_ins, :status, :invoice_id)
+      ";
+      $statement = $connect->prepare($query);
+
+      if ($statement->execute($data)) {
+          $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button>
+          <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';
+      } else {
+          $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Cannot save.</div>';
+      }
+  }
+}
+// Redirect after processing
+header('Location: /inventory/deduction/' . $_GET['edit']);
+exit;
+
 }
 
 include '../inc/header.php';
