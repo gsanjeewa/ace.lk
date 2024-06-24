@@ -410,19 +410,18 @@ include '../inc/header.php';
                   </li>
                   <li class="list-group-item">
                     <b>Old Employee No:</b> 
-                    <a class="float-right">
+                    <span class="float-right">
                     <?php 
                     $statement = $connect->prepare('SELECT * FROM join_status WHERE employee_id="'.$row['employee_id'].'" AND employee_no!="'.$row['employee_no'].'" ORDER BY join_id DESC');
                     $statement->execute();
                     $total_data = $statement->rowCount();
                     $result = $statement->fetchAll();                     
                     foreach($result as $row_join):
-                      echo $row_join['employee_no'].', '; 
+                      echo '<a href="/employee_list/employee/'.$row['employee_id'].'/'.$row_join['join_id'].'">'.$row_join['employee_no'].'</a>,'; 
                     endforeach;
                     
                     ?>
-                      
-                    </a>
+                    </span>
                   </li>
                   <li class="list-group-item">
                     <b>Birthday:</b> <a class="float-right"><?php echo $row['birthday']; ?></a>

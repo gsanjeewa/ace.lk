@@ -1040,6 +1040,17 @@ foreach($result as $row_users)
               <?php
               }
 
+              if (checkPermissions($_SESSION["user_id"], 76) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/payment/advance_halt" class="nav-link <?= ($second_part == 'advance_halt') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-warning"></i>
+                    <p>Advance (Halt)</p>
+                  </a>
+                </li> 
+                <?php
+                }
+
               if (checkPermissions($_SESSION["user_id"], 79) == "true") {
               ?>
               <li class="nav-item">
