@@ -3,8 +3,15 @@
 include 'config.php';
 
 $connect = pdoConnection();
-$today = date("Y-m-d");
+$today = new DateTime();
 
+// Subtract one year from the current date
+$today->modify('-1 year');
+
+// Format the date as "YYYY-MM"
+$todayFormatted = $today->format('Y-m');
+
+// Arrays to hold data
 $employee_ids = [];
 $basic_salaries = [];
 $increment_dates = [];
@@ -30,14 +37,12 @@ $query = '
         FROM increment_rate 
         GROUP BY position_id
     ) d ON c.position_id = d.position_id AND c.id = d.maxid 
-    WHERE 
-        MONTH(a.increment_date) <= MONTH(CURDATE()) 
-        AND YEAR(a.increment_date) <= YEAR(CURDATE() - INTERVAL 1 YEAR) 
+    WHERE DATE_FORMAT(a.increment_date, "%Y-%m") <= :todayFormatted 
         AND a.status = 0
 ';
 
 $statement = $connect->prepare($query);
-$statement->execute();
+$statement->execute([':todayFormatted' => $todayFormatted]);
 $result = $statement->fetchAll();
 
 foreach ($result as $row) {

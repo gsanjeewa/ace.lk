@@ -1128,55 +1128,78 @@ include '../inc/header.php';
               <!-- /.card-header -->
               <div class="card-body">
                 <?php 
-                $query = 'SELECT * FROM inventory_issue WHERE employee_id="'.$row['join_id'].'" AND status = 1 ORDER BY id DESC';
+                // Define the initial query to fetch inventory data along with product, color, and gender details in a single query using joins
+                $query = '
+                SELECT 
+                    a.id AS inventory_id, 
+                    a.qty, 
+                    a.total,
+                    b.id AS invoice_id,
+                    b.employee_id,
+                    p.product_name, 
+                    a.size, 
+                    c.color AS color_name, 
+                    g.gender AS gender_name
+                FROM 
+                    inventory_stock a 
+                INNER JOIN 
+                    inventory_create_invoice b ON a.invoice_id = b.id 
+                LEFT JOIN 
+                    inventory_product p ON a.product_id = p.id
+                LEFT JOIN 
+                    inventory_color c ON a.color = c.id
+                LEFT JOIN 
+                    inventory_gender g ON a.gender = g.id
+                WHERE 
+                    b.employee_id = :employee_id AND b.status = 1 
+                ORDER BY 
+                    a.id DESC
+                ';
 
+                // Prepare and execute the query
                 $statement = $connect->prepare($query);
-                $statement->execute();
-                $total_data = $statement->rowCount();
+                $statement->execute([':employee_id' => $row['join_id']]);
 
-                $result = $statement->fetchAll();
+                // Fetch all results
+                $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                // Start HTML table
                 ?>
-
-                <table id="example6" class="table table-bordered table-sm table-striped" >
-                  <thead>
+                <table id="example6" class="table table-bordered table-sm table-striped">
+                <thead>
                     <tr style="text-align: center;">
-                      <th>#</th>
-                      <th>Product</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <!-- <th>Loan Close Date</th> -->
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
                     </tr>
-                  </thead>
-                  <tbody>
-                    <?php                     
-                      $startpoint =0;
-                      $sno = $startpoint + 1;
-                      foreach($result as $row_eqpt)
-                      {
-                        $query = 'SELECT * FROM inventory_product WHERE id="'.$row_eqpt['product_id'].'" ';
-
-                        $statement = $connect->prepare($query);
-                        $statement->execute();
-                        $result = $statement->fetchAll();
-                        foreach($result as $row_product)
-                        {
-                          
-                        }
-                       
-                    ?>
-
-                    <tr>
-                      <td><center><?php echo $sno; ?></center></td>
-                      <td><?php echo $row_product['product_name'];?></td>
-                      <td><center><?php echo $row_eqpt['qty'];?></center></td>
-                      <td style="text-align: right;"><?php echo number_format($row_eqpt['total']);?></td>
-                      
-                    </tr>
+                </thead>
+                <tbody>
                     <?php
-                        $sno ++;
-                      }
-                      ?>
-                  </tbody>
+                    $sno = 1;
+                    foreach ($result as $row_eqpt) {
+                        $product_name = $row_eqpt['product_name'];
+                        $size = $row_eqpt['size'];
+                        $color = $row_eqpt['color_name'];
+                        $gender = $row_eqpt['gender_name'];
+
+                        // If color or gender has a specific condition to be empty
+                        $color = ($row_eqpt['color_name'] == 1) ? '' : $color;
+                        $gender = ($row_eqpt['gender_name'] == 1) ? '' : $gender;
+
+                        // Display the row
+                        ?>
+                        <tr>
+                            <td><center><?php echo $sno; ?></center></td>
+                            <td><?php echo $product_name . ' ' . $size . ' ' . $color . ' ' . $gender; ?></td>
+                            <td><center><?php echo $row_eqpt['qty']; ?></center></td>
+                            <td style="text-align: right;"><?php echo number_format($row_eqpt['total']); ?></td>
+                        </tr>
+                        <?php
+                        $sno++;
+                    }
+                    ?>
+                </tbody>
                 </table>
               </div>
               <!-- /.card-body -->
