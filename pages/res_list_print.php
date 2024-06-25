@@ -173,40 +173,52 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 	    	<div class="row">
 	    	<div style="width: 100%;">
 	    		<table>
-	    			<tr>
-	    				<th>විස්තරය</th>
-	    				<th>මුදල</th>
+	    			<tr >
+	    				<th width="70%" align="center">විස්තරය</th>
+	    				<th width="30%"align="center">මුදල</th>
 	    			</tr>
-
-
 	    			<tr>
 	    				
-	                    <td width="30%">අත්හිටවන ලද වැටුප</td>	                    
-	                    <td width="68%"><?php echo number_format($row['last_month_pay'],2); ?></td>
+	                    <td>අත්හිටවන ලද වැටුප</td>	                    
+	                    <td><?php echo number_format($row['last_month_pay'],2); ?></td>
 	                </tr>
 	                <tr>
 	                	<?php
 	                   foreach(json_decode($row['loan_deduction']) as $k => $val):
 	                  ?>
 	                <tr> 
-                        <td width="73%"><?php echo $val->did; ?></td>
+                        <td><?php echo $val->did; ?></td>
                         
-                        <td width="25%" align="right"><?php echo number_format($val->amount, 2)?></td> 
+                        <td align="right"><?php echo number_format($val->amount, 2)?></td> 
                     </tr>
 					<?php
 	                endforeach;
 	                  ?>
 	                </tr>
 	                <tr>
-	                    <td width="30%">අඩුකිරීම් වල එකතුව</td>
+	                    <td >අඩුකිරීම් වල එකතුව</td>
 	                    
-	                    <td width="68%" align="right"><b><?php echo number_format($row['total_deduction'],2);?></b></td>                               
-	                </tr>	                
+	                    <td  align="right"><b><?php echo number_format($row['total_deduction'],2);?></b></td>                               
+	                </tr>
+					
+					<tr>
+	                	<?php
+	                   foreach(json_decode($row['ration_deduction']) as $t => $val):
+	                  ?>
+	                <tr> 
+                        <td ><?php echo $val->reson; ?></td>
+                        
+                        <td  align="right"><?php echo number_format($val->amount, 2)?></td> 
+                    </tr>
+					<?php
+	                endforeach;
+	                  ?>
+	                </tr>
 	                
 	                <tr>
-	                <td width="30%">ගෙවිමට ඇති මුදල</td>
+	                <td >ගෙවිමට ඇති මුදල</td>
 	                
-	                    <td width="63%"><b><?php echo number_format($row['net_amount'],2)?></b></td>
+	                    <td ><b><?php echo number_format($row['net_amount'],2)?></b></td>
 	                </tr>	                
 	    		</table>    		
 			</div>

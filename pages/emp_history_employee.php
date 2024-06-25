@@ -24,6 +24,18 @@ if ($total_data > 0){
   endforeach; 
 }
 
+$query_join = 'SELECT * FROM join_status WHERE join_id="'.$_GET['join_id'].'"';
+
+$statement = $connect->prepare($query_join);
+$statement->execute();
+$total_data = $statement->rowCount();
+$result = $statement->fetchAll();
+if ($total_data > 0){   
+  foreach($result as $row_join):                   
+
+  endforeach; 
+}
+
 include '../inc/header.php';
 
 ?>
@@ -31,7 +43,7 @@ include '../inc/header.php';
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark"><?php echo $row['surname'].' '.$row['initial']; ?></h1>
+            <h1 class="m-0 text-dark"><?php echo $row['surname'].' '.$row['initial']; ?><span class="badge badge-warning"><?php echo $row_join['join_date'].' - '.$row_join['resignation_date']; ?></span></h1>            
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
