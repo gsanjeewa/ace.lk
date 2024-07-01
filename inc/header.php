@@ -1622,6 +1622,17 @@ foreach($result as $row_users)
               </li>
              <?php
               }
+
+              if (checkPermissions($_SESSION["user_id"], 3) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/reports/misc/etf" class="nav-link <?= ($third_part == 'etf') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-info"></i>
+                    <p>ETF</p>
+                  </a>
+                </li>
+               <?php
+                }
               ?>
               <!-- <li class="nav-item">
                 <a href="/users/role" class="nav-link <?= ($second_part == 'role') ? 'active':''; ?>">
