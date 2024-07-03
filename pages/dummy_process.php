@@ -432,7 +432,7 @@ $delete_permision = array(
     //----------------------8 shift included Half Days, Poya & Mercantile------------------//
 
     elseif($shifts_type==7):
-      $h_days=$h_dayss;
+      $h_days=0;
       $h_ot_hrs=$h_days*2;
       if ($dm_nomal-$total_shifts > 0) {
         $absent_day=$dm_nomal-$total_shifts;

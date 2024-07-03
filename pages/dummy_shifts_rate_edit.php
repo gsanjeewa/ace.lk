@@ -66,7 +66,7 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                             <option value="4"<?php if ($row->shifts==4){ echo "SELECTED";}?>>Nomal Rate included Half Days, Poya & Mercantile</option>
                             <option value="5"<?php if ($row->shifts==5){ echo "SELECTED";}?>>Total shifts</option>
                             <option value="6"<?php if ($row->shifts==6){ echo "SELECTED";}?>>Nomal Rate Max OT 60 & included Half Days</option>
-                            <option value="7"<?php if ($row->shifts==7){ echo "SELECTED";}?>>8 Shift included Half Days, Poya & Mercantile</option>
+                            <option value="7"<?php if ($row->shifts==7){ echo "SELECTED";}?>>8 Shift Rate</option>
                         </select>
                             </div>
                         </div>
@@ -114,7 +114,7 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                             <option value="4">Nomal Rate included Half Days, Poya & Mercantile</option>
                             <option value="5">Total shifts</option>
                             <option value="6">Nomal Rate Max OT 60 & included Half Days</option>
-                            <option value="7">8 Shift included Half Days, Poya & Mercantile</option>
+                            <option value="7">8 Shift Rate</option>
                         </select>
                     </div>
                 </div>

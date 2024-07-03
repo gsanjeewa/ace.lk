@@ -47,7 +47,19 @@ function fetchMonthlyETF($connect, $employeeId, $month) {
     $statement = $connect->prepare($query);
     $statement->execute([':month' => $month, ':employee_id' => $employeeId]);
     $result = $statement->fetch();
-    return $result ? $result['employer_etf'] : '-';
+    return $result ? $result['employer_etf'] : 0;    
+}
+
+function fetchMonthlyEarnings($connect, $employeeId, $month) {
+    $query = "SELECT a.basic_epf 
+              FROM payroll_items a 
+              INNER JOIN payroll b ON a.payroll_id = b.id 
+              WHERE DATE_FORMAT(date_from, '%Y-%m') = :month AND a.employee_id = :employee_id";
+
+    $statement = $connect->prepare($query);
+    $statement->execute([':month' => $month, ':employee_id' => $employeeId]);
+    $result = $statement->fetch();    
+    return $result ? $result['basic_epf'] : '-';
 }
 
 ?>
@@ -120,10 +132,10 @@ function fetchMonthlyETF($connect, $employeeId, $month) {
                                 <table id="example2" class="table table-bordered table-striped">
                                     <thead style="text-align: center;">
                                         <tr>
-                                            <th>NIC Number</th>
-                                            <th>Surname</th>
-                                            <th>Initials</th>
-                                            <th>Member Number</th>
+                                            <th rowspan="2">NAME OF MEMBER</th>
+                                            <th rowspan="2">MEMBER's NUMBER</th>
+                                            <th rowspan="2">NIC NO</th>
+                                            <th rowspan="2">TOTAL CONTRIBUTION</th>
                                             <?php
                                             if (isset($_GET['from_date']) && isset($_GET['to_date'])) {
                                                 $start = new DateTime($_GET['from_date']);
@@ -131,7 +143,20 @@ function fetchMonthlyETF($connect, $employeeId, $month) {
                                                 $interval = DateInterval::createFromDateString('1 month');
                                                 $period = new DatePeriod($start, $interval, $end->add($interval));
                                                 foreach ($period as $dt) {
-                                                    echo "<th>" . $dt->format("Y-m") . "</th>";
+                                                    echo '<th colspan="2">' . strtoupper($dt->format("M")) . '</th>';
+                                                }
+                                            }
+                                            ?>
+                                        </tr>
+                                        <tr>
+                                            <?php
+                                            if (isset($_GET['from_date']) && isset($_GET['to_date'])) {
+                                                $start = new DateTime($_GET['from_date']);
+                                                $end = new DateTime($_GET['to_date']);
+                                                $interval = DateInterval::createFromDateString('1 month');
+                                                $period = new DatePeriod($start, $interval, $end->add($interval));
+                                                foreach ($period as $dt) {
+                                                    echo '<th>EARNINGS</th><th>CONTRIBUTION</th>';
                                                 }
                                             }
                                             ?>
@@ -146,14 +171,23 @@ function fetchMonthlyETF($connect, $employeeId, $month) {
                                             foreach ($result as $row) {
                                                 $employeeData = fetchEmployeeData($connect, $row['employee_id']);
                                                 echo "<tr>
-                                                    <td style='text-align: left;'>{$employeeData['nic_no']}</td>
-                                                    <td style='text-align: left;'>{$employeeData['surname']}</td>
-                                                    <td style='text-align: left;'>{$employeeData['initial']}</td>
-                                                    <td style='text-align: right;'>{$row['employee_no']}</td>";
+                                                    <td style='text-align: left;'>{$employeeData['surname']} {$employeeData['initial']}</td>
+                                                    <td style='text-align: right;'>{$row['employee_no']}</td>
+                                                    <td style='text-align: left;'>{$employeeData['nic_no']}</td>";
+
+                                                $totalETF = 0;
                                                 foreach ($period as $dt) {
                                                     $month = $dt->format("Y-m");
                                                     $etf = fetchMonthlyETF($connect, $row['employee_id'], $month);
-                                                    echo "<td>$etf</td>";
+                                                    $totalETF += $etf;
+                                                }
+                                                echo "<td style='text-align: right;'>$totalETF</td>";
+
+                                                foreach ($period as $dt) {
+                                                    $month = $dt->format("Y-m");
+                                                    $etf = fetchMonthlyETF($connect, $row['employee_id'], $month);
+                                                    $earnings = fetchMonthlyEarnings($connect, $row['employee_id'], $month);
+                                                    echo "<td>$earnings</td><td>$etf</td>";
                                                 }
                                                 echo "</tr>";
                                             }
