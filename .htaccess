@@ -56,6 +56,8 @@ RewriteRule ^allowance_list/shifts_allowance$ pages/all_shifts_allowance.php [NC
 RewriteRule ^edit_shifts_allowance$ pages/all_shifts_allowance_edit.php [NC,L]
 RewriteRule ^allowance_list/shifts_allowance_emp$ pages/all_shifts_allowance_emp.php [NC,L]
 RewriteRule ^edit_shifts_allowance_emp$ pages/all_shifts_allowance_emp_edit.php [NC,L]
+RewriteRule ^allowance_list/shifts_allowance_institute$ pages/all_shifts_allowance_institute.php [NC,L]
+RewriteRule ^edit_shifts_allowance_institute$ pages/all_shifts_allowance_institute_edit.php [NC,L]
 
 #deduction
 RewriteRule ^deduction_list/deduction$ pages/ded_deduction.php [NC,L]

@@ -309,6 +309,16 @@ foreach($result as $row_users)
               <?php
               }
               
+              if (checkPermissions($_SESSION["user_id"], 37) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/allowance_list/shifts_allowance_institute" class="nav-link <?= ($second_part == 'shifts_allowance_institute') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-info"></i>
+                    <p>Shifts Allowance Institute</p>
+                  </a>
+                </li>
+                <?php
+                }
               ?>
             </ul>
           </li>
