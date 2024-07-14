@@ -834,7 +834,7 @@ if($request == 7){
 	{	
 		$start_date = date('Y-m-d', strtotime($_POST['start_date']));
 		$query = "
-		SELECT e.initial, e.surname, p.position_abbreviation, j.employee_no, a.no_of_shifts, c.position_id, a.extra_ot_hrs, t.position_abbreviation AS position, a.attendance_status, a.id, a.poya_day, a.m_day, a.m_ot_hrs
+		SELECT e.initial, e.surname, p.position_abbreviation, j.employee_no, a.no_of_shifts, a.shifts_type, c.position_id, a.extra_ot_hrs, t.position_abbreviation AS position, a.attendance_status, a.id, a.poya_day, a.m_day, a.m_ot_hrs
 		FROM attendance a
 		INNER JOIN join_status j ON a.employee_id = j.join_id
 		INNER JOIN employee e ON j.employee_id = e.employee_id
@@ -861,9 +861,17 @@ if($request == 7){
 				}else{
 					$action='<form action="" method="POST"><input type="hidden" name="att_id" value="'.$row['id'].'"><button class="btn btn-sm btn-outline-danger" name="remove_attendance"  data-toggle="tooltip" data-placement="top" title="Delete" type="submit"><i class="fa fa-trash"></i></button></form>';
 				}
+
+				if ($row['shifts_type']==1) {
+					$shifts_type='12 Hrs';
+				}elseif($row['shifts_type']==2){
+					$shifts_type='8 Hrs';
+				}
+
 				$output[] = array(
 					'emp_name'	 	 =>	$row['employee_no'].' '.$row['position'].' '.$row['initial'].' '.$row['surname'],
 					'position_name'	 =>	$row['position_abbreviation'],
+					'shifts_type'	 =>	$shifts_type,
 					'no_of_shifts'	 =>	$row['no_of_shifts'],
 					'extra_ot_hrs'	 =>	$row['extra_ot_hrs'],
 					'm_day'	 				 =>	$row['m_day'],

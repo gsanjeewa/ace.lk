@@ -172,7 +172,7 @@ WHERE
       $dm = $dm_new/2;
     }
 
-      //-----------------Shift details------------------------//
+      //-----------------12 hrs Shift details------------------------//
 
     	$statement = $connect->prepare("SELECT COALESCE(sum(a.no_of_shifts * b.position_payment),'0') AS total_amount, COALESCE(sum(a.no_of_shifts),'0') AS total_shifts FROM attendance a 
         INNER JOIN 
@@ -194,13 +194,44 @@ WHERE
         position_pay b 
     ON 
         c.maxid = b.position_pay_id  
-        WHERE a.start_date = '".$date_from."' AND a.end_date = '".$date_to."' AND a.employee_id='".$employee_id."' AND (a.attendance_status=0 OR a.attendance_status=2)");
+        WHERE a.start_date = '".$date_from."' AND a.end_date = '".$date_to."' AND a.employee_id='".$employee_id."' AND (a.attendance_status=0 OR a.attendance_status=2) AND a.shifts_type=1");
       $statement->execute();
       $result = $statement->fetchAll();
       foreach($result as $total_shifts){
 
-        $total_amount=$total_shifts['total_amount'];
-        $total_shifts=$total_shifts['total_shifts'];
+        $total_amount_12=$total_shifts['total_amount'];
+        $total_shifts_12=$total_shifts['total_shifts'];
+
+      }
+      //-----------------8 hrs Shift details------------------------//
+
+      $statement = $connect->prepare("SELECT COALESCE(sum(a.no_of_shifts * b.position_payment),'0') AS total_amount, COALESCE(sum(a.no_of_shifts),'0') AS total_shifts FROM attendance a 
+        INNER JOIN 
+        (
+            SELECT 
+                department_id, 
+                position_id, 
+                MAX(position_pay_id) AS maxid 
+            FROM 
+                position_pay 
+            GROUP BY 
+                department_id, 
+                position_id
+        ) c 
+    ON 
+        a.department_id = c.department_id 
+        AND a.position_id = c.position_id 
+    INNER JOIN 
+        position_pay b 
+    ON 
+        c.maxid = b.position_pay_id  
+        WHERE a.start_date = '".$date_from."' AND a.end_date = '".$date_to."' AND a.employee_id='".$employee_id."' AND (a.attendance_status=0 OR a.attendance_status=2) AND a.shifts_type=2");
+      $statement->execute();
+      $result = $statement->fetchAll();
+      foreach($result as $total_shifts_type){
+
+        $total_amount_8=$total_shifts_type['total_amount'];
+        $total_shifts_8=$total_shifts_type['total_shifts'];
 
       }
 
@@ -680,6 +711,8 @@ WHERE
       
       $m_ot_payment=($basic_salary/200)*3*$m_ot_hrss;
 
+      $total_shifts=(string)$total_shifts_12+(string)$total_shifts_8;
+
       $poya_minus=$total_shifts-$poya_days-$m_days;
         if ($poya_minus < $dm) {
           $working_salary=(($basic_salary/$dm)*$poya_minus)+$poya_day_payment+$m_payment;          
@@ -704,7 +737,7 @@ WHERE
       }
        
         //-----------------ot------------------------//
-        $ot_hrs=($total_shifts-$m_days)*3;        
+        $ot_hrs=($total_shifts_12-$m_days)*3;        
         $ot_amount=(($basic_salary/200)*1.5)*$ot_hrs;
 
         $extra_ot_amount=(($basic_salary/200)*1.5)*$total_extra;                      
@@ -730,7 +763,9 @@ WHERE
         //     $absent_day=0;
         //     $absent_amount=0;
         //   }
-        // }       
+        // }   
+        
+        $total_amount=(string)$total_amount_12+(string)$total_amount_8;
 
         $total_allowance=(string)$extra_ot_amount+(string)$total_service_allowance+(string)$rewards_allowance+(string)$chairman_allowance+(string)$training_allowance+(string)$pending_allowance+(string)$allow_amount;
         
@@ -844,55 +879,55 @@ WHERE
         }
 
 		$data = array(
-      ':p_id'             => $sno ++,
-  		':payroll_id'  	    => trim($_POST["payroll_id"]),
-  		':employee_id'      => $employee_id,
-  		':employee_no'      => $employee_no,
-  		':position_id'      => $position_id,
-			':bank_id'          => $bank_id,
-  		':no_of_shift'      => $total_shifts,
-      ':department_id'  => $department_id,
-  		':department'  =>  json_encode($department),
-  		':basic_salary'  	=> $basic_salary,
-      ':basic_epf'   => $working_salary,
-  		':ot_hrs'  	=> $ot_hrs,
-  		':ot_amount'  	=> $ot_amount,
-  		':sot_hrs'  	=> $total_extra,
-	  	':sot_amount'  	=> $extra_ot_amount,
+      ':p_id'               => $sno ++,
+  		':payroll_id'  	      => trim($_POST["payroll_id"]),
+  		':employee_id'        => $employee_id,
+  		':employee_no'        => $employee_no,
+  		':position_id'        => $position_id,
+			':bank_id'            => $bank_id,
+  		':no_of_shift'        => $total_shifts,
+      ':department_id'      => $department_id,
+  		':department'         => json_encode($department),
+  		':basic_salary'  	    => $basic_salary,
+      ':basic_epf'          => $working_salary,
+  		':ot_hrs'  	          => $ot_hrs,
+  		':ot_amount'  	      => $ot_amount,
+  		':sot_hrs'  	        => $total_extra,
+	  	':sot_amount'  	      => $extra_ot_amount,
       ':poya_days'          => $poya_days,
       ':m_days'             => $m_days,
       ':m_ot_hrs'           => $m_ot_hrss,
       ':poya_day_payment'   => $poya_day_payment1,
       ':m_payment'          => $m_payment1,
-      ':m_ot_payment'          => $m_ot_payment,
-	  	':incentive'  	=> $incentive,
-      ':service_allowance'    => $total_service_allowance,
-      ':rewards'    => $rewards_allowance,
-      ':chairman_allowance'    => $chairman_allowance,
-      ':training_be'    => $training_allowance,
-      ':pending_payments'    => $pending_allowance,
+      ':m_ot_payment'       => $m_ot_payment,
+	  	':incentive'  	      => $incentive,
+      ':service_allowance'  => $total_service_allowance,
+      ':rewards'            => $rewards_allowance,
+      ':chairman_allowance' => $chairman_allowance,
+      ':training_be'        => $training_allowance,
+      ':pending_payments'   => $pending_allowance,
       ':allowance_amount'  	=> $total_allowance,
-	  	':allowances'  	=> json_encode($allowance),
-	  	':gross'  	=> $gross,
-	  	':absent_day'  	=> $absent_day,
-	  	':absent_amount'  	=> $absent_amount,
-	  	':employee_epf'  	=> $epf_8,
+	  	':allowances'  	      => json_encode($allowance),
+	  	':gross'  	          => $gross,
+	  	':absent_day'  	      => $absent_day,
+	  	':absent_amount'  	  => $absent_amount,
+	  	':employee_epf'  	    => $epf_8,
 			':deduction_amount'  	=> $level_eight_deduction,
-			':deductions'  	=> json_encode($deductions),
-      ':hostel'   => $hostel_ded,
-      ':fines'   => $fines_ded,
-      ':pending_deductions'   => $pending_ded,
-			':employer_epf'  	=> $epf_12,
-			':employer_etf'  	=> $etf_3,
-			':net'  	=> $level_eight_net,
-			':id'  	=>$_POST["payroll_id"],
-			':status'  	=> 1,
-      ':status_pay'   => $status_payroll,
-      ':loan_amount'   => $loan_ded,
+			':deductions'  	      => json_encode($deductions),
+      ':hostel'             => $hostel_ded,
+      ':fines'              => $fines_ded,
+      ':pending_deductions' => $pending_ded,
+			':employer_epf'  	    => $epf_12,
+			':employer_etf'  	    => $etf_3,
+			':net'  	            => $level_eight_net,
+			':id'  	              => $_POST["payroll_id"],
+			':status'  	          => 1,
+      ':status_pay'         => $status_payroll,
+      ':loan_amount'        => $loan_ded,
       ':inventory_amount'   => $inventory_ded,
-      ':advance_amount'   => $advance_amount,
-      ':ration_amount'   => $ration_ded,
-      ':death_donation'   =>$death_amount,	  		
+      ':advance_amount'     => $advance_amount,
+      ':ration_amount'      => $ration_ded,
+      ':death_donation'     => $death_amount,	  		
 	 	);
 
 	 	$query = "

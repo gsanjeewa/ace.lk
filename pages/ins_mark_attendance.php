@@ -95,7 +95,7 @@ if ((isset($_POST['add_save'])) OR (isset($_POST['spl_save']))){
   }
 
   for ($i=0; $i < count($_POST['position_id']); $i++) {
-    $statement = $connect->prepare("SELECT * FROM attendance WHERE employee_id='".$employee_id."' AND department_id='".$_GET['mark']."' AND position_id='".$_POST['position_id'][$i]."' AND start_date='".$start_date."' AND end_date='".$end_date."'");
+    $statement = $connect->prepare("SELECT * FROM attendance WHERE employee_id='".$employee_id."' AND department_id='".$_GET['mark']."' AND position_id='".$_POST['position_id'][$i]."' AND start_date='".$start_date."' AND end_date='".$end_date."' AND shifts_type='".$_POST['shifts_type'][$i]."'");
     $statement->execute(); 
     if($statement->rowCount()>0){
       $error = true;
@@ -112,6 +112,7 @@ if ((isset($_POST['add_save'])) OR (isset($_POST['spl_save']))){
           ':position_id'    =>  $_POST['position_id'][$i],
           ':start_date'     =>  $start_date,
           ':end_date'       =>  $end_date,
+          ':shifts_type'   =>  $_POST['shifts_type'][$i],
           ':no_of_shifts'   =>  $_POST['no_of_shifts'][$i], 
           ':extra_ot_hrs'   =>  $_POST['extra_ot_hrs'][$i],
           ':poya_day'       =>  $_POST['poya_day'][$i],
@@ -120,8 +121,8 @@ if ((isset($_POST['add_save'])) OR (isset($_POST['spl_save']))){
       );
      
       $query = "
-      INSERT INTO attendance(employee_id, department_id, position_id, start_date, end_date, no_of_shifts, poya_day, m_day, m_ot_hrs, extra_ot_hrs)
-      VALUES (:employee_id, :department_id, :position_id, :start_date, :end_date, :no_of_shifts, :poya_day, :m_day, :m_ot_hrs, :extra_ot_hrs);
+      INSERT INTO attendance(employee_id, department_id, position_id, start_date, end_date, shifts_type, no_of_shifts, poya_day, m_day, m_ot_hrs, extra_ot_hrs)
+      VALUES (:employee_id, :department_id, :position_id, :start_date, :end_date, :shifts_type, :no_of_shifts, :poya_day, :m_day, :m_ot_hrs, :extra_ot_hrs);
       ";
 
       $statement = $connect->prepare($query);
@@ -385,7 +386,21 @@ include '../inc/header.php';
                           </div>
                       </div>
                     </div>
+                    <div class="col-md-3">
+                      <div class="form-group clearfix">
+                        <div class="icheck-success d-inline">
+                          <input type="radio" id="12_hrs" name="shifts_type" value="1" checked>
+                          <label for="12_hrs">12 Hrs
+                          </label>
+                        </div>
 
+                        <div class="icheck-success d-inline">
+                          <input type="radio" id="8_hrs" name="shifts_type" value="2">
+                          <label for="8_hrs">8 Hrs
+                          </label>
+                        </div>
+                    </div>
+                    </div>
                     <div class="col-md-3">
                       <div class="total_shifts" style="justify-content: center;" ></div>
                     </div>
@@ -394,27 +409,27 @@ include '../inc/header.php';
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group clearfix">
-                    <div class="icheck-primary d-inline">
-                      <input type="radio" id="service_no" name="search_selection" value="Service_no" checked>
-                      <label for="service_no">Service No
-                      </label>
-                    </div>
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" id="service_no" name="search_selection" value="Service_no" checked>
+                        <label for="service_no">Service No
+                        </label>
+                      </div>
 
-                    <div class="icheck-primary d-inline">
-                      <input type="radio" id="nic_no_new1" name="search_selection" value="new">
-                      <label for="nic_no_new1">New NIC
-                      </label>
-                    </div>
-                    <div class="icheck-primary d-inline">
-                      <input type="radio" id="nic_no_old1" name="search_selection" value="Old">
-                      <label for="nic_no_old1">Old NIC
-                      </label>
-                    </div>
-                    <div class="icheck-primary d-inline">
-                      <input type="radio" id="emp_name" name="search_selection" value="emp_name">
-                      <label for="emp_name">Name
-                      </label>
-                    </div>                     
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" id="nic_no_new1" name="search_selection" value="new">
+                        <label for="nic_no_new1">New NIC
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" id="nic_no_old1" name="search_selection" value="Old">
+                        <label for="nic_no_old1">Old NIC
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline">
+                        <input type="radio" id="emp_name" name="search_selection" value="emp_name">
+                        <label for="emp_name">Name
+                        </label>
+                      </div>                    
                   </div>
 
                   <div class="form-group" id="service_no_field">                    
@@ -701,6 +716,7 @@ include '../inc/header.php';
                       <th>#</th>
                       <th>Employee Name</th>
                       <th>Position Name</th>
+                      <th>Shifts Type</th>
                       <th>No of Shifts</th>
                       <th>Mercantile Days</th>
                       <th>Mercantile OT Hrs</th>
@@ -1112,6 +1128,7 @@ function load_attendance(department_id = '' , )
           html += '<td style="width:5%;"><center>'+serial_no+'</center></td>';
           html += '<td style="width:30%;">'+response[count].emp_name+'</td>';
           html += '<td style="width:10%;"><center>'+response[count].position_name+'</center></td>';
+          html += '<td style="text-align:right; width:10%;"><center>'+response[count].shifts_type+'</center></td>';
           html += '<td style="text-align:right; width:10%;"><center>'+response[count].no_of_shifts+'</center></td>';
           html += '<td style="text-align:right; width:10%;"><center>'+response[count].m_day+'</center></td>';
           html += '<td style="text-align:right; width:9%;"><center>'+response[count].m_ot_hrs+'</center></td>';

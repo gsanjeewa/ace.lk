@@ -314,7 +314,7 @@ include '../inc/header.php';
             </button>
           </div>
           <div class="modal-body" id="info_update4">
-            <?php @include("../edit_role.php");?>
+            <?php @include("/edit_role");?>
           </div>
           <div class="modal-footer ">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -337,12 +337,10 @@ include '../inc/header.php';
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body" id="info_update1">
-            <?php @include("../edit_role_permissions.php");?>
+          <div id="info_update1">
+            <?php @include("/edit_role_permissions");?>
           </div>
-          <div class="modal-footer ">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          </div>
+          
           <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->

@@ -13,81 +13,84 @@ if (checkPermissions($_SESSION["user_id"], 45) == "false") {
 }
 
 ?>
-<div class="card-body">
-    <form action="" id="" method="post">
+<form action="" id="" method="post">
+<div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+    
     <div class="row">
 
     <?php
-    if(isset($_POST['edit_per_id']))
-    {
-        $eid=$_POST['edit_per_id'];
-        $query="SELECT permission_id, role_id, ref_id FROM system_permission_to_roles WHERE role_id=:eid";
-        $statement = $connect->prepare($query);
-        $statement-> bindParam(':eid', $eid, PDO::PARAM_STR);
-        $statement->execute();
-        $result = $statement->fetchAll();
-        $checked_arr=array();
-        $check_id=array();
-        foreach($result as $row_per)
-        {
-            $checked_arr[]=$row_per['permission_id'];
-            $check_id[]=$row_per['ref_id'];                              
-        }                                                        
+    if (isset($_POST['edit_per_id'])) {
+      $eid = $_POST['edit_per_id'];
       
-        $query="SELECT * FROM system_permissions WHERE status=0 ORDER BY permission_group ASC";
-        $statement = $connect->prepare($query);
-        $statement->execute();
-        $result = $statement->fetchAll();
-        $per_id=array();
-        foreach($result as $row_perm)
-        {
-            $per_id[]=$row_perm['permission_id'];                 
-            $per_name[$row_perm['permission_id']] = $row_perm['permission_name'];
-        }
-
+      // Fetch permissions linked to the role
+      $query = "SELECT permission_id, role_id, ref_id FROM system_permission_to_roles WHERE role_id=:eid";
+      $statement = $connect->prepare($query);
+      $statement->bindParam(':eid', $eid, PDO::PARAM_STR);
+      $statement->execute();
+      $result = $statement->fetchAll();
+      $checked_arr = array();
+      $check_id = array();
+      foreach ($result as $row_per) {
+          $checked_arr[] = $row_per['permission_id'];
+          $check_id[] = $row_per['ref_id'];
+      }
+  
+      // Fetch all permissions
+      $query = "SELECT * FROM system_permissions WHERE status=0 ORDER BY permission_group ASC";
+      $statement = $connect->prepare($query);
+      $statement->execute();
+      $result = $statement->fetchAll();
+  
+      // Organize permissions by group
+      $permissions_by_group = array();
+      foreach ($result as $row_perm) {
+          $permissions_by_group[$row_perm['permission_group']][] = $row_perm;
+      }
+  
+      // Generate HTML for each permission group
+      foreach ($permissions_by_group as $group => $permissions) {
+        ?>
         
-        for ($i=0; $i < count($per_id); $i++){
-
-            if (in_array($per_id[$i], $checked_arr)) {
-                ?>
-                <input type="hidden" name="ref_id[]" value="<?php echo $check_id[$i]; ?>">
-                <div class="col-md-3">
-                    <div class="form-group clearfix">
-                        <div class="icheck-primary d-inline">
-                            <input type="checkbox" id="permissions<?php echo $per_id[$i]; ?>" name="permissions[]" value="<?php echo $per_id[$i]; ?>" checked>
-                            <label for="permissions<?php echo $per_id[$i]; ?>"><?php echo $per_name[$per_id[$i]]; ?>
-                            </label>
-                        </div>                           
-                    </div>
-                </div>                              
-                <?php
-              
-            }else{
-                ?>
-                <input type="hidden" name="ref_id[]">
-                <div class="col-md-3">
-                    <div class="form-group clearfix">
-                        <div class="icheck-primary d-inline">
-                            <input type="checkbox" id="permissions<?php echo $per_id[$i]; ?>" name="permissions[]" value="<?php echo $per_id[$i]; ?>">
-                            <label for="permissions<?php echo $per_id[$i]; ?>"><?php echo $per_name[$per_id[$i]]; ?>
-                            </label>
-                        </div>                           
-                    </div>
-                </div>
-                <?php
-            }            
-        }
-
-    }
+          <div class="col-md-12"><h4><b><?php
+          echo $group?></b></h4></div>
+       <?php
+          foreach ($permissions as $permission) {
+              $per_id = $permission['permission_id'];
+              $per_name = $permission['permission_name'];
+              $checked = in_array($per_id, $checked_arr);
+              $ref_id = $checked ? $check_id[array_search($per_id, $checked_arr)] : "";
+              ?>
+              <input type="hidden" name="ref_id[]" value="<?php echo $ref_id; ?>">
+              <div class="col-md-3">
+                  <div class="form-group clearfix">
+                      <div class="icheck-primary d-inline">
+                          <input type="checkbox" id="permissions<?php echo $per_id; ?>" name="permissions[]" value="<?php echo $per_id; ?>" <?php echo $checked ? 'checked' : ''; ?>>
+                          <label for="permissions<?php echo $per_id; ?>"><?php echo $per_name; ?></label>
+                      </div>
+                  </div>
+              </div>
+              <?php
+          }
+          ?>        
+          
+          <?php
+      }
+  }
+  
     ?>
           <input type="hidden" name="role_id" value="<?php echo $_POST['edit_per_id']; ?>">
         
 
         
 </div>
-<button type="submit" name="update_save" class="btn btn-primary btn-fw mr-2" style="float: left;">Update</button>
-</form>
 </div>
+<div class="modal-footer ">
+<button type="submit" name="update_save" class="btn btn-primary btn-fw mr-2" style="float: left;">Update</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          </div>
+
+</form>
+
 
 <script>
 $(function () {
