@@ -115,7 +115,7 @@ include '../inc/header.php';
                       {
                         $effective_date=date('Y-m-d', strtotime($_GET['effective_date']));
 
-                      $statement = $connect->prepare("SELECT a.employee_id, a.employee_epf, a.employer_epf, a.basic_epf, a.employee_no, b.date_from, b.date_to, a.no_of_shift, a.department_id FROM payroll_items a INNER JOIN payroll b ON a.payroll_id=b.id WHERE a.status=1 AND b.date_from='".$effective_date."' AND a.employee_epf > 0 ORDER BY a.id DESC");
+                      $statement = $connect->prepare("SELECT a.employee_id, a.employee_epf, a.employer_epf, a.basic_epf, a.employee_no, b.date_from, b.date_to, a.no_of_shift, a.department_id FROM payroll_items a INNER JOIN payroll b ON a.payroll_id=b.id WHERE b.date_from='".$effective_date."' AND a.employee_epf > 0 ORDER BY a.id DESC");
                       $statement->execute();
                       $total_data = $statement->rowCount();
 
@@ -125,7 +125,7 @@ include '../inc/header.php';
                       $sno = $startpoint + 1;
                       foreach($result as $row)
                       {
-                        $query_emp = 'SELECT e.nic_no, e.surname, e.initial, j.employee_no, j.join_date FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id INNER JOIN (SELECT employee_id, MAX(join_id) maxid FROM join_status GROUP BY employee_id) b ON j.employee_id = b.employee_id AND j.join_id = b.maxid WHERE j.join_id="'.$row['employee_id'].'" ORDER BY e.employee_id DESC';
+                        $query_emp = 'SELECT e.nic_no, e.surname, e.initial, j.employee_no, j.join_date FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id WHERE j.join_id="'.$row['employee_id'].'" ORDER BY e.employee_id DESC';
 
                         $statement = $connect->prepare($query_emp);
                         $statement->execute();

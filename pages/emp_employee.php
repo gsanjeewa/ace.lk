@@ -143,6 +143,44 @@ if ($total_data > 0) {
   }
 }
 
+if (isset($_POST['add_epf'])){
+
+  if (checkPermissions($_SESSION["user_id"], 1) == "false") {
+
+    $_SESSION["msg"] ='<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions to Add Employee.</div>'; 
+    header('location:/employee_list/employee/'.$_GET['edit'].'');  
+    exit();
+  }
+
+  if (!$error) {
+
+    $data = array(
+      ':employee_id'    =>  $_SESSION["empid"],
+      ':from_date'    =>  date('Y-m-d', strtotime($_POST['from_date'])),
+      ':to_date'  =>  date('Y-m-d', strtotime($_POST['to_date'])),
+    );
+   
+    $query = "
+    INSERT INTO epf_excluded(employee_id, from_date, to_date)
+        VALUES (:employee_id, :from_date, :to_date);
+    ";   
+   
+    $statement = $connect->prepare($query);
+
+    if($statement->execute($data))
+    {
+      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';
+                  
+    }else{
+      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
+         
+    }
+  }
+}
+
+
 if (isset($_POST['employee_disable'])){
 
   if (checkPermissions($_SESSION["user_id"], 1) == "false") {
@@ -260,8 +298,21 @@ include '../inc/header.php';
                   <h3 class="card-title">Employee List</h3>                
                 </div>
                   <!-- /.card-header -->
-                <div class="card-body"> 
-                <table id="emp_data" class="table table-bordered table-striped">
+                <div class="card-body">  
+                  <?php
+                  
+                  $query="SELECT e.employee_id, e.surname, e.initial, j.employee_no, e.nic_no, e.permanent_address, e.mobile_no, j.employee_status, p.position_abbreviation, j.join_id, j.join_date, j.location FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id INNER JOIN (SELECT employee_id, MAX(join_id) maxid FROM join_status GROUP BY employee_id) b ON j.employee_id = b.employee_id AND j.join_id = b.maxid INNER JOIN promotions c ON j.employee_id=c.employee_id INNER JOIN (SELECT employee_id, MAX(id) maxproid FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxproid INNER JOIN position p ON c.position_id=p.position_id ORDER BY ABS(j.employee_no) DESC";
+
+                  /*$query = 'SELECT * FROM employee ORDER BY employee_id ASC';*/
+
+                  $statement = $connect->prepare($query);
+                  $statement->execute();
+                  $total_data = $statement->rowCount();
+                  $result = $statement->fetchAll();
+
+                  ?>
+
+                  <table id="example2" class="table table-bordered table-striped">
                     <thead style="text-align: center; width: 100%;">
                       <tr>
                         <th>#</th>                        
@@ -278,9 +329,161 @@ include '../inc/header.php';
                       </tr>
                     </thead>
                     <tbody>
-                      </tbody>
-                  </table>
+                      <?php
+                      $startpoint =0;
+                      $sno = $startpoint + 1;
+                      foreach($result as $row)
+                      {
+                        $statement = $connect->prepare('SELECT c.position_abbreviation FROM promotions a INNER JOIN position c ON a.position_id=c.position_id INNER JOIN (SELECT employee_id, MAX(id) maxid FROM promotions GROUP BY employee_id) b ON a.employee_id = b.employee_id AND a.id = b.maxid WHERE a.employee_id="'.$row['join_id'].'"');
+                          $statement->execute();
+                          $total_position = $statement->rowCount();
+                          $result = $statement->fetchAll();
+                          if ($total_position > 0) :
+                            foreach($result as $position_name):
+                  
+                              $position_id = $position_name['position_abbreviation'];
+                            endforeach;
+                          else:
+                            $position_id ='';
+                          endif;
 
+                          if (!empty($row['employee_no'])) {
+                              $employee_epf=$row['employee_no'];
+                          }else{
+                            $employee_epf='';
+                          }
+
+                          $statement = $connect->prepare('SELECT a.id, a.account_no, a.status, b.bank_name, b.bank_no, c.branch_name, c.branch_no FROM bank_details a INNER JOIN bank_name b ON a.bank_name=b.id INNER JOIN bank_branch c ON a.branch_name=c.id WHERE a.employee_id="'.$row['employee_id'].'"');
+                          $statement->execute();
+                          $total_bank = $statement->rowCount();
+                          $result = $statement->fetchAll();
+                          if ($total_bank > 0) :
+                            foreach($result as $row_b):
+                  
+                              $bank_name1 = $row_b['bank_name'].' ('.$row_b['bank_no'].')';
+                              $branch_name1 = $row_b['branch_name'].' ('.str_pad($row_b['branch_no'], 3, "0", STR_PAD_LEFT).')';
+                              $account_no1 =str_pad($row_b['account_no'], 12, "0", STR_PAD_LEFT);
+                            endforeach;
+                          else:
+                            $bank_name1 ='';
+                            $branch_name1 ='';
+                            $account_no1 ='';
+                          endif;
+
+                          if($row['join_date']!='0000-00-00'):
+
+                          $date1 = $row['join_date'];
+
+                          $date2 = date('Y-m-d');
+
+                          $diff = abs(strtotime($date2)-strtotime($date1));
+
+                          $years = floor($diff / (365*60*60*24));
+
+                          $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+
+                          $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+
+                          endif;
+
+                          $statement = $connect->prepare('SELECT basic_salary FROM salary a INNER JOIN (SELECT employee_id, MAX(id) maxid FROM salary GROUP BY employee_id) b ON a.employee_id = b.employee_id AND a.id = b.maxid WHERE a.employee_id="'.$row['join_id'].'"');
+                          $statement->execute();
+                          $total_basic = $statement->rowCount();
+                          $result = $statement->fetchAll();
+                          if ($total_basic > 0) :
+                            foreach($result as $row_basic):
+                  
+                              $basic_salary = number_format($row_basic['basic_salary']);
+                            endforeach;
+                          else:
+                            $basic_salary ='';
+                          endif; 
+
+                          $statement = $connect->prepare('SELECT department_name, department_location FROM department  WHERE department_id="'.$row['location'].'"');
+                          $statement->execute();
+                          $total_loc = $statement->rowCount();
+                          $result_loc = $statement->fetchAll();
+                          if ($total_loc > 0) :
+                            foreach($result_loc as $row_loc):
+                  
+                              $location = $row_loc['department_name'].'-'.$row_loc['department_location'];
+                            endforeach;
+                          else:
+                            $location ='';
+                          endif;                          
+                        ?>
+                        <tr>
+                            <td><?php echo $sno; ?></td>
+                            <td style="text-align: left;"><?php echo $employee_epf.' '.$position_id.' '.$row['surname'].' '.$row['initial'];?></td>
+                            <td><?php echo $row['nic_no'];?></td>
+                            <td><center>
+                        <dt><?php if($row['join_date']!='0000-00-00'): echo $row['join_date']; endif;
+
+                          ?></dt>
+                          <dd><?php 
+                          echo $years.'Y'.' '.$months.'M'.' '.$days.'D';
+                          ?></dd></center></td>
+                            <td style="text-align:right;"><?php echo $basic_salary;?></td>
+                            <td><?php echo $location;?></td>
+                            <td><dl>
+                          <dt><?php echo $bank_name1;?></dt>
+                          <dd><?php echo $branch_name1;?></dd>
+                          <dd><?php echo $account_no1;?></dd>
+                        </dl></td>
+                            <td><?php echo $row['permanent_address'];?></td>
+                            <td><?php echo $row['mobile_no'];?></td>
+                            <td>
+                              <center>
+                                <?php if($row['employee_status'] == 0): ?>
+                                  <span class="badge badge-success">Present</span>
+                                <?php elseif($row['employee_status'] == 1): ?>
+                                  <span class="badge badge-danger">Absent</span>
+                                <?php elseif($row['employee_status'] == 2): ?>
+                                  <span class="badge badge-warning">Re-Enlisted</span>
+                                <?php elseif($row['employee_status'] == 3): ?>
+                                  <span class="badge badge-warning">Resignation</span>
+                                <?php elseif($row['employee_status'] == 4): ?>
+                                  <span class="badge badge-secondary">Disable</span>
+                                <?php endif ?>
+                              </center>
+                            </td>
+                            <td>
+                              <center>
+
+								                <a href="/employee_list/employee/<?php echo $row['employee_id']?>" class="btn btn-sm btn-outline-warning" data-toggle="tooltip" data-placement="left" title="View Profile"><i class="fa fa-eye"></i></a>
+                                
+                                <button class="edit_data4 btn btn-sm btn-outline-success" data-id="<?php echo $row['employee_id'];?>" type="button" data-toggle="tooltip" data-placement="top" title="Add Bank"><i class="fa fa-bank"></i></button>
+
+                                <button class="edit_promote btn btn-sm btn-outline-secondary" data-id="<?php echo $row['join_id'];?>" type="button" data-toggle="tooltip" data-placement="top" title="Promote"><i class="fa fa-plus"></i></button>
+
+                                <a href="/employee_list/add_employee/<?php echo $row['employee_id']?>" class="btn btn-sm btn-outline-primary" data-toggle="tooltip" data-placement="left" title="Edit"><i class="fa fa-edit"></i></a>
+
+                                <button class="edit_epf btn btn-sm btn-outline-info" data-id="<?php echo $row['join_id'];?>" type="button" data-toggle="tooltip" data-placement="top" title="EPF Excluded "><i class="fa fa-bank"></i></button>
+
+                                <form action="" method="POST" enctype="multipart/form-data">
+                                  <input type="hidden" name="row_id" value="<?php echo $row['join_id']; ?>">
+
+                                  <?php if ($row['employee_status']==4): ?>
+                                    <button class="btn btn-sm btn-outline-success" type="submit" data-toggle="tooltip" data-placement="top" title="Enable" name="employee_enable"><i class="fas fa-toggle-off"></i></button>
+                                  
+                                
+                                  <?php else:?>
+                                    
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" data-toggle="tooltip" data-placement="top" title="Disable" name="employee_disable"><i class="fas fa-toggle-on"></i></button>
+                                    
+
+                                  <?php endif ?>
+								                                              
+								                </form>
+                              </center>
+                            </td>
+                        </tr>
+                        <?php
+                        $sno ++;
+                      }
+                      ?>
+                    </tbody>
+                  </table>
                 </div>
                 <!-- /.card-body -->
               </div>
@@ -342,44 +545,58 @@ include '../inc/header.php';
     </div>
     <!--   end modal --> 
 
+    <!--  start  modal -->
+    <div id="editepf" class="modal fade">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">EPF Excluded</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="info_epf">
+            <?php @include("/epf_excluded_edit");?>
+          </div>
+          <!-- <div class="modal-footer ">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          </div> -->
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
+    </div>
+    <!--   end modal --> 
+
 <?php
 include '../inc/footer.php';
 ?>
 
 <script type="text/javascript">
+  $(document).ready(function() {
+
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+      "scrollX": false,
+    });
+
+ 
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+
+  });
+</script>
+<script type="text/javascript">
 
     $(document).ready(function(){
-
-      var t = $('#emp_data').DataTable({
-        "processing":true,
-        "serverSide":true,
-        "autoWidth": true,
-        "scrollX": false,
-        "responsive":true,
-        "order":[],
-        "ajax":{
-         url:"/employee_fetch",
-         type:"POST"
-        },
-        "columnDefs":[
-         {
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        }
-        ],
-
-        order: [[1, 'asc']]
-
-       });
-
-      t.on( 'order.dt search.dt', function () {
-        t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        });
-      }).draw();
-
-
       $(document).on('click','.edit_data4',function(){
         $("#editData4").modal({
             backdrop: 'static',
@@ -414,9 +631,21 @@ include '../inc/footer.php';
         });
       });
 
-      $(function () {
-      $('[data-toggle="tooltip"]').tooltip()
-    });
-
+      $(document).on('click','.edit_epf',function(){
+        $("#editepf").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        var edit_epf_id=$(this).attr('data-id');
+        $.ajax({
+          url:"/epf_excluded_edit",
+          type:"post",
+          data:{edit_epf_id:edit_epf_id},
+          success:function(data){
+            $("#info_epf").html(data);
+            $("#editepf").modal('show');
+          }
+        });
+      });
     });
   </script>
