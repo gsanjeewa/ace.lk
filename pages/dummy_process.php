@@ -366,6 +366,7 @@ $delete_permision = array(
           $h_ot_hrs=0;
           $working_salary=$n_day_earning;
 
+//----------------------Nomal Rate Max OT 60 & included Half Days------------------//
           elseif($shifts_type==6):
             $h_days=$h_dayss;
             $h_ot_hrs=$h_days*6;
@@ -428,6 +429,71 @@ $delete_permision = array(
             }else{
               $working_salary=$basic_salary;
             }
+    //----------------------8 shift included Half Days, Poya & Mercantile------------------//
+
+    elseif($shifts_type==7):
+      $h_days=0;
+      $h_ot_hrs=$h_days*2;
+      if ($dm_nomal-$total_shifts > 0) {
+        $absent_day=$dm_nomal-$total_shifts;
+        $absent_amount=round(($basic_salary/$dm_nomal)*$absent_day, 2);
+      }else{
+        $absent_day=0;
+        $absent_amount=0;
+      }
+
+      if ($rows['poya_days'] > 0) {
+        $poya_days=$rows['poya_days'];
+      }else{
+        $poya_days=0;
+      }
+
+      if ($rows['m_days'] > 0) {
+        $m_days=$rows['m_days'];
+      }else{
+        $m_days=0;
+      }
+       $n_working_days=(int)$total_shifts-(int)$poya_days-(int)$m_days;
+      if ($n_working_days < $dm_nomal) {
+        $n_day_earning=round(($basic_salary/$dm_nomal)*$n_working_days,2);
+      }else{
+        $n_day_earning=$basic_salary;
+      }
+      
+      
+
+    if ($rows['m_ot_hrss'] > 0) {
+      $m_ot_hrss=$rows['m_ot_hrss'];
+    }else{
+      $m_ot_hrss=0;
+    } 
+    $total_ot_hrss=0;
+
+      // $total_ot_hrss=(int)$rows['total_ot_hrss']+(int)$h_ot_hrs-(int)$m_ot_hrss;
+      // $ot_payment=($basic_salary/200)*1.5*$total_ot_hrss; 
+      //-----------------Poya Day Payment------------------------//
+  
+      $poya_day_payment=($basic_salary/26)*$poya_days*1.5;
+
+      //-----------------M Day Payment------------------------//
+      
+      $m_payment=($basic_salary/26)*$m_days*2;
+
+      //-----------------Over Time x (1.5)------------------------//
+      
+      $ot_payment=($basic_salary/200)*1.5*($total_ot_hrss+$h_ot_hrs);
+
+      //-----------------Over Time x (3)------------------------//
+      
+      $ot_t_payment=($basic_salary/200)*3*$m_ot_hrss; 
+
+      $poya_minus=$total_shifts-$poya_days-$m_days;
+      
+      if ($poya_minus < $dm_nomal) {
+        $working_salary=($basic_salary/$dm_nomal)*$poya_minus;          
+      }else{
+        $working_salary=$basic_salary;
+      }
           else:
          
         endif;  

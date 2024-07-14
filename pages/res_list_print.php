@@ -183,17 +183,40 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 	                    <td><?php echo number_format($row['last_month_pay'],2); ?></td>
 	                </tr>
 	                <tr>
-	                	<?php
-	                   foreach(json_decode($row['loan_deduction']) as $k => $val):
-	                  ?>
-	                <tr> 
-                        <td><?php echo $val->did; ?></td>
-                        
-                        <td align="right"><?php echo number_format($val->amount, 2)?></td> 
-                    </tr>
 					<?php
-	                endforeach;
-	                  ?>
+						// Decode the JSON data
+						$loan_deduction = json_decode($row['loan_deduction']);
+						
+						// Check if the decoded data is an array or an object
+						if (is_array($loan_deduction) || is_object($loan_deduction)):
+							foreach ($loan_deduction as $k => $val):
+								// Check if $val is an object and has the necessary properties
+								if (is_object($val) && isset($val->did) && isset($val->amount)):
+					?>
+					<tr> 
+						<td><?php echo htmlspecialchars($val->did); ?></td>
+						<td align="right"><?php echo number_format($val->amount, 2); ?></td> 
+					</tr>
+					<?php
+								else:
+									// Handle the case where values are empty or missing
+					?>
+					<!-- <tr>
+						<td colspan="2">No data available</td>
+					</tr> -->
+					<?php
+								endif;
+							endforeach;
+						else:
+							// Handle the case where $loan_deduction is not an array or object
+					?>
+					<!-- <tr>
+						<td colspan="2">Invalid data format</td>
+					</tr> -->
+					<?php
+						endif;
+					?>
+
 	                </tr>
 	                <tr>
 	                    <td >අඩුකිරීම් වල එකතුව</td>
@@ -202,17 +225,40 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 	                </tr>
 					
 					<tr>
-	                	<?php
-	                   foreach(json_decode($row['ration_deduction']) as $t => $val):
-	                  ?>
-	                <tr> 
-                        <td ><?php echo $val->reson; ?></td>
-                        
-                        <td  align="right"><?php echo number_format($val->amount, 2)?></td> 
-                    </tr>
 					<?php
-	                endforeach;
-	                  ?>
+						// Decode the JSON data
+						$ration_deduction = json_decode($row['ration_deduction']);
+						
+						// Check if the decoded data is an array or an object
+						if (is_array($ration_deduction) || is_object($ration_deduction)):
+							foreach ($ration_deduction as $t => $val):
+								// Check if $val is an object and has the necessary properties
+								if (is_object($val) && isset($val->reson) && isset($val->amount) && !empty($val->reson) && !empty($val->amount)):
+					?>
+					<tr> 
+						<td><?php echo htmlspecialchars($val->reson); ?></td>
+						<td align="right"><?php echo number_format($val->amount, 2); ?></td> 
+					</tr>
+					<?php
+								else:
+									// Handle the case where values are empty or missing
+					?>
+					<!-- <tr>
+						<td colspan="2">No data available</td>
+					</tr> -->
+					<?php
+								endif;
+							endforeach;
+						else:
+							// Handle the case where $ration_deduction is not an array or object
+					?>
+					<!-- <tr>
+						<td colspan="2">Invalid data format</td>
+					</tr> -->
+					<?php
+						endif;
+					?>
+
 	                </tr>
 	                
 	                <tr>

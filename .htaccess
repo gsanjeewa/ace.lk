@@ -42,6 +42,7 @@ RewriteRule ^list_fetch$ pages/res_list_fetch.php [NC,L]
 RewriteRule ^employee_list/resignation/print/([-\w]+)$ pages/res_list_print.php?print=$1 [NC,L]
 RewriteRule ^employee_list/epf_excluded$ pages/emp_epf_etf_excluded.php [NC,L]
 RewriteRule ^employee_list/disable$ pages/emp_disable.php [NC,L]
+RewriteRule ^fetch_employees$ pages/fetch_employees.php [NC,L]
 
 
 #allowances
@@ -55,6 +56,8 @@ RewriteRule ^allowance_list/shifts_allowance$ pages/all_shifts_allowance.php [NC
 RewriteRule ^edit_shifts_allowance$ pages/all_shifts_allowance_edit.php [NC,L]
 RewriteRule ^allowance_list/shifts_allowance_emp$ pages/all_shifts_allowance_emp.php [NC,L]
 RewriteRule ^edit_shifts_allowance_emp$ pages/all_shifts_allowance_emp_edit.php [NC,L]
+RewriteRule ^allowance_list/shifts_allowance_institute$ pages/all_shifts_allowance_institute.php [NC,L]
+RewriteRule ^edit_shifts_allowance_institute$ pages/all_shifts_allowance_institute_edit.php [NC,L]
 
 #deduction
 RewriteRule ^deduction_list/deduction$ pages/ded_deduction.php [NC,L]
@@ -227,6 +230,9 @@ RewriteRule ^reports/deduction/dsummary$ pages/reports_dsummary.php [NC,L]
 RewriteRule ^dsummary_fetch$ pages/reports_dsummary_fetch.php [NC,L]
 RewriteRule ^reports/misc/epf_etf$ pages/reports_epf_etf.php [NC,L]
 RewriteRule ^epf_etf_fetch$ pages/reports_epf_etf_fetch.php [NC,L]
+RewriteRule ^reports/misc/etf$ pages/reports_etf.php [NC,L]
+RewriteRule ^reports/misc/etf/([-\w]+)/(\d+)$ pages/reports_etf.php?from=$1&to=$2 [NC,L]
+RewriteRule ^etf_fetch$ pages/reports_etf_fetch.php [NC,L]
 
 RewriteRule ^reports/misc/to_be_applied$ pages/reports_to_be_applied.php [NC,L]
 RewriteRule ^to_be_applied_fetch$ pages/reports_to_be_applied_fetch.php [NC,L]

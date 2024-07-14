@@ -110,7 +110,7 @@ include '../inc/header.php';
      </div>
      <div class="form-group" align="center">
       <button type="button" name="filter" id="filter" class="btn btn-info">Filter</button>
-      <button class="btn btn-primary"><i class="fas fa-print"> Print</i></button>
+      <button class="btn btn-primary"><i class="fas fa-print"></i> Print</button>
       
      </div>
    </form>

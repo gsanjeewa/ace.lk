@@ -309,6 +309,16 @@ foreach($result as $row_users)
               <?php
               }
               
+              if (checkPermissions($_SESSION["user_id"], 37) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/allowance_list/shifts_allowance_institute" class="nav-link <?= ($second_part == 'shifts_allowance_institute') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-info"></i>
+                    <p>Shifts Allowance Institute</p>
+                  </a>
+                </li>
+                <?php
+                }
               ?>
             </ul>
           </li>
@@ -1622,6 +1632,17 @@ foreach($result as $row_users)
               </li>
              <?php
               }
+
+              if (checkPermissions($_SESSION["user_id"], 3) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/reports/misc/etf" class="nav-link <?= ($third_part == 'etf') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-info"></i>
+                    <p>ETF</p>
+                  </a>
+                </li>
+               <?php
+                }
               ?>
               <!-- <li class="nav-item">
                 <a href="/users/role" class="nav-link <?= ($second_part == 'role') ? 'active':''; ?>">
