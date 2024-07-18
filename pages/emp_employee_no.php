@@ -866,6 +866,8 @@ if($request == 7){
 					$shifts_type='12 Hrs';
 				}elseif($row['shifts_type']==2){
 					$shifts_type='8 Hrs';
+				}else{
+					$shifts_type='12 Hrs';
 				}
 
 				$output[] = array(
@@ -874,10 +876,10 @@ if($request == 7){
 					'shifts_type'	 =>	$shifts_type,
 					'no_of_shifts'	 =>	$row['no_of_shifts'],
 					'extra_ot_hrs'	 =>	$row['extra_ot_hrs'],
-					'm_day'	 				 =>	$row['m_day'],
-					'm_ot_hrs'	 		 =>	$row['m_ot_hrs'],
-					'poya_day'	 		 =>	$row['poya_day'],			
-					'action'	 			 =>	$action,
+					'm_day'	 		 =>	$row['m_day'],
+					'm_ot_hrs'	 	 =>	$row['m_ot_hrs'],
+					'poya_day'	 	 =>	$row['poya_day'],			
+					'action'	 	 =>	$action,
 				);			
 			}		
 
