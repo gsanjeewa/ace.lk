@@ -1893,5 +1893,79 @@ if($request == 28){
 	echo json_encode($output);
 }
 
+if($request == 29){
+	$output = array();
+	if((isset($_POST["query"])) OR (isset($_POST["query_new_nic"])) OR (isset($_POST["query_nic_old"])))
+	{
+		if($_POST["query"] != '')
+		{
+			$query = "SELECT e.initial, e.surname, p.position_abbreviation, j.employee_no, j.employee_status, j.location FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id INNER JOIN (SELECT employee_id, MAX(join_id) maxid FROM join_status GROUP BY employee_id) b ON j.employee_id = b.employee_id AND j.join_id = b.maxid INNER JOIN promotions c ON j.join_id=c.employee_id INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxid_pro INNER JOIN position p ON c.position_id=p.position_id WHERE j.employee_no='".$_POST["query"]."'
+			";
+		}
+
+		if($_POST["query_new_nic"] != '')
+		{
+			$query = " SELECT e.initial, e.surname, p.position_abbreviation, j.employee_no, j.employee_status, j.location FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id INNER JOIN (SELECT employee_id, MAX(join_id) maxid FROM join_status GROUP BY employee_id) b ON j.employee_id = b.employee_id AND j.join_id = b.maxid INNER JOIN promotions c ON j.join_id=c.employee_id INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxid_pro INNER JOIN position p ON c.position_id=p.position_id WHERE e.nic_no='".$_POST["query_new_nic"]."'		
+			";
+		}
+
+		if($_POST["query_nic_old"] != '')
+		{
+			$query = "SELECT e.initial, e.surname, p.position_abbreviation, j.employee_no, j.employee_status, j.location FROM employee e INNER JOIN join_status j ON e.employee_id = j.employee_id INNER JOIN (SELECT employee_id, MAX(join_id) maxid FROM join_status GROUP BY employee_id) b ON j.employee_id = b.employee_id AND j.join_id = b.maxid INNER JOIN promotions c ON j.join_id=c.employee_id INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) d ON c.employee_id = d.employee_id AND c.id = d.maxid_pro INNER JOIN position p ON c.position_id=p.position_id WHERE e.nic_no='".$_POST["query_nic_old"]."'		
+			";
+		}
+
+		$query .=" ORDER BY j.join_id DESC LIMIT 1";
+			
+
+			$statement = $connect->prepare($query);
+
+			$statement->execute();
+
+			$total_data = $statement->rowCount();
+
+			$result = $statement->fetchAll();
+			
+			foreach($result as $row)
+			{
+				$query = "
+				SELECT department_name, department_location FROM department WHERE department_id='".$row['location']."'	
+				";
+
+				$statement = $connect->prepare($query);
+				$statement->execute();
+				$result = $statement->fetchAll();
+				if ($statement->rowCount() > 0) :
+					foreach($result as $row_l):
+						$loc=' ('.trim($row_l['department_name']).'-'.trim($row_l['department_location']).')';
+					endforeach;
+				else:
+					$loc='';
+				endif;
+				
+
+				if($row['employee_status'] == 0):
+                  $status='<span class="badge badge-success">Present</span>';
+                elseif($row['employee_status'] == 1):
+                  $status='<span class="badge badge-danger">Absent</span>';
+                elseif($row['employee_status'] == 2):
+                  $status='<span class="badge badge-warning">Re-Enlisted</span>';
+                elseif($row['employee_status'] == 3):
+                  $status='<span class="badge badge-warning">Resignation</span>';
+				else:
+					$status='<span class="badge badge-secondary">Disable</span>';					
+                endif;
+
+				$output[] = array(
+					'name_with_initial'	 =>	 $row['employee_no'].' '.$row['position_abbreviation'].' '.$row['surname'].' '.$row['initial'].'-'.$status.' '.$loc
+				);			
+			}
+
+			
+		echo json_encode($output);
+
+	}
+}
+
 
 ?>

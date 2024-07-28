@@ -521,21 +521,21 @@ $(function () {
     rules: {
       employee_id: {
         remote: {
-          url: "/check_employee_id",
+          url: "/check_employee_id_d",
           type: "post"
         }
       },
 
       nic_new1: { 
         remote: {
-          url: "/check_employee_id",
+          url: "/check_employee_id_d",
           type: "post"
         }
       },
 
       nic_old1: { 
         remote: {
-          url: "/check_employee_id",
+          url: "/check_employee_id_d",
           type: "post"
         }
       },
@@ -658,7 +658,7 @@ function load_data(query = '')
   $.ajax({
     url:"/employee_no",
     method:"POST",
-    data:{query:query,query_new_nic:query_new_nic,query_nic_old:query_nic_old,request:1},
+    data:{query:query,query_new_nic:query_new_nic,query_nic_old:query_nic_old,request:29},
     dataType: 'json',
 
     success:function(response)
