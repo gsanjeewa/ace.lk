@@ -34,13 +34,14 @@ if(isset($_POST['add_new']))
   if (!$error) {
     $data = array(
         ':department_id'  =>  strtoupper($_POST['department_id']),
+        ':position_id'  =>  $_POST['position_id'],
         ':shifts'  =>  strtoupper($_POST['shifts']),
         
     );
    
     $query = "
-    INSERT INTO `shifts_rate`(`department_id`, `shifts`)
-    VALUES (:department_id, :shifts)
+    INSERT INTO `shifts_rate`(`department_id`, `position_id`, `shifts`)
+    VALUES (:department_id, :position_id, :shifts)
     ";
             
     $statement = $connect->prepare($query);
@@ -69,10 +70,11 @@ if(isset($_POST['insert']))
     $data = array(
         ':id'         =>  $_SESSION['editbid'],
         ':department_id'  =>  strtoupper($_POST['department_id']),
+        ':position_id'  =>  $_POST['position_id'],
         ':shifts'  =>  strtoupper($_POST['shifts']),
     );
    
-    $query = "UPDATE `shifts_rate` SET `department_id`=:department_id, `shifts`=:shifts WHERE `id`=:id";
+    $query = "UPDATE `shifts_rate` SET `department_id`=:department_id, `position_id`=:position_id, `shifts`=:shifts WHERE `id`=:id";
             
     $statement = $connect->prepare($query);
 
@@ -197,7 +199,7 @@ include '../inc/header.php';
 
                   <?php
 
-                  $query = 'SELECT b.department_name, b.department_location, a.shifts, a.id, a.status FROM shifts_rate a INNER JOIN department b ON a.department_id=b.department_id ORDER BY b.department_name ASC';
+                  $query = 'SELECT b.department_name, b.department_location, a.shifts, a.id, a.status, a.position_id FROM shifts_rate a INNER JOIN department b ON a.department_id=b.department_id ORDER BY b.department_name ASC';
 
                   $statement = $connect->prepare($query);
                   $statement->execute();
@@ -212,6 +214,7 @@ include '../inc/header.php';
                       <tr>
                         <th>#</th>                        
                         <th>Institution</th>
+                        <th>Position</th>
                         <th>Shifts</th>
                         <th>Status</th>
                         <th>Action</th>                                                  
@@ -223,6 +226,21 @@ include '../inc/header.php';
                       $sno = $startpoint + 1;
                       foreach($result as $row)
                       {
+
+                        $statement = $connect->prepare('SELECT position_abbreviation FROM position  WHERE position_id="'.$row['position_id'].'"');
+                        $statement->execute();
+                        $total_position = $statement->rowCount();
+                        $result = $statement->fetchAll();
+                        if ($total_position > 0) :
+                          foreach($result as $position_name):
+
+                            $position = $position_name['position_abbreviation'];
+                          endforeach;
+                        else:
+                          $position ='';
+                        endif;
+
+
                         if($row['status'] == 0): 
                         $status='<span class="badge badge-success">Active</span>';
                        elseif($row['status'] == 1): 
@@ -233,6 +251,7 @@ include '../inc/header.php';
                         <tr>
                             <td><center><?php echo $sno; ?></center></td>
                             <td><?php echo $row['department_name'].'-'.$row['department_location']; ?></td>
+                            <td><center><?php echo $position; ?></center></td>
                             <td><center><?php echo $row['shifts']; ?></center></td>
                             <td><center><?php echo $status; ?></center></td>
                             <td>

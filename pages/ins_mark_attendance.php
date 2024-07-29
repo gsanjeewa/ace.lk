@@ -112,7 +112,7 @@ if ((isset($_POST['add_save'])) OR (isset($_POST['spl_save']))){
           ':position_id'    =>  $_POST['position_id'][$i],
           ':start_date'     =>  $start_date,
           ':end_date'       =>  $end_date,
-          ':shifts_type'   =>  $_POST['shifts_type'][$i],
+          ':shifts_type'   =>  $_POST['shifts_type'],
           ':no_of_shifts'   =>  $_POST['no_of_shifts'][$i], 
           ':extra_ot_hrs'   =>  $_POST['extra_ot_hrs'][$i],
           ':poya_day'       =>  $_POST['poya_day'][$i],

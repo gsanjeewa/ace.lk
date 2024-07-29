@@ -53,6 +53,29 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                             </div>
                         </div>
                     </div>
+
+                    <div class="row">
+                      <div class="form-group col-md-12">
+                        <label class="col-sm-12 pl-0 pr-0">Position</label>
+                        <div class="col-sm-12 pl-0 pr-0">
+                            <select class="form-control select2" style="width: 100%;" name="position_id" id="position_id">
+                                <option value="">Select Position</option>
+                                <?php
+                                $query="SELECT * FROM position ORDER BY priority ASC";
+                                $statement = $connect->prepare($query);
+                                $statement->execute();
+                                $result = $statement->fetchAll();
+                                foreach($result as $row_position)
+                                {
+                                  ?>
+                                  <option value="<?php echo $row_position['position_id']; ?>"<?php if ($row_position['position_id']==$row->position_id){ echo "SELECTED";}?>><?php echo $row_position['position_abbreviation']; ?></option>
+                                  <?php
+                                }
+                                ?>
+                            </select>                                
+                        </div>
+                      </div>
+                    </div>
                     
                     <div class="row">
                         <div class="form-group col-md-12">
@@ -91,6 +114,31 @@ if ((checkPermissions($_SESSION["user_id"], 87) == "false") OR (checkPermissions
                         </select>                                
                     </div>
                 </div>
+            </div>
+
+            <div class="row">
+
+            <div class="form-group col-md-12">
+                    <label class="col-sm-12 pl-0 pr-0">Position</label>
+                    <div class="col-sm-12 pl-0 pr-0">
+                        <select class="form-control select2" style="width: 100%;" name="position_id" id="position_id">
+                            <option value="">Select Position</option>
+                            <?php
+                            $query="SELECT * FROM position ORDER BY priority ASC";
+                            $statement = $connect->prepare($query);
+                            $statement->execute();
+                            $result = $statement->fetchAll();
+                            foreach($result as $row_position)
+                            {
+                              ?>
+                              <option value="<?php echo $row_position['position_id']; ?>"><?php echo $row_position['position_abbreviation']; ?></option>
+                              <?php
+                            }
+                            ?>
+                        </select>                                
+                    </div>
+                </div>
+
             </div>
 
             <div class="row">

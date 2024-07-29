@@ -142,7 +142,7 @@ WHERE
     	}
 
       //------------------shift details-----------------------//
-    $statement = $connect->prepare("SELECT shifts FROM shifts_rate a INNER JOIN attendance b ON a.department_id = b.department_id WHERE b.start_date = '".$date_from."' AND b.end_date = '".$date_to."' AND b.employee_id='".$employee_id."' AND (b.attendance_status=0 OR b.attendance_status=2) AND a.status=0 ORDER BY a.id DESC LIMIT 1");
+    $statement = $connect->prepare("SELECT shifts FROM shifts_rate a INNER JOIN attendance b ON a.department_id = b.department_id AND a.position_id = b.position_id WHERE b.start_date = '".$date_from."' AND b.end_date = '".$date_to."' AND b.employee_id='".$employee_id."' AND (b.attendance_status=0 OR b.attendance_status=2) AND a.status=0 ORDER BY a.id DESC LIMIT 1");
       $statement->execute();
       $result = $statement->fetchAll();
       
@@ -234,6 +234,8 @@ WHERE
         $total_shifts_8=$total_shifts_type['total_shifts'];
 
       }
+
+      $total_shifts=(string)$total_shifts_12+(string)$total_shifts_8;
 
       $statement = $connect->prepare("SELECT COALESCE(sum(extra_ot_hrs),'0') AS total_extra FROM attendance WHERE start_date = '".$date_from."' AND end_date = '".$date_to."' AND employee_id='".$employee_id."' AND (attendance_status=0 OR attendance_status=2)");
       $statement->execute();
@@ -709,9 +711,7 @@ WHERE
 
       //-----------------Over Time x (3)------------------------//
       
-      $m_ot_payment=($basic_salary/200)*3*$m_ot_hrss;
-
-      $total_shifts=(string)$total_shifts_12+(string)$total_shifts_8;
+      $m_ot_payment=($basic_salary/200)*3*$m_ot_hrss;      
 
       $poya_minus=$total_shifts-$poya_days-$m_days;
         if ($poya_minus < $dm) {
