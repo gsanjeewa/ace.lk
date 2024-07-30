@@ -23,20 +23,21 @@ if(isset($_POST['add_new']))
   }
 
   $department_id=  strtoupper($_POST['department_id']);
-  $statement = $connect->prepare("SELECT department_id FROM shifts_rate WHERE department_id=:department_id");
+  $position_id=  strtoupper($_POST['position_id']);
+  $statement = $connect->prepare("SELECT department_id, position_id FROM shifts_rate WHERE department_id=:department_id AND position_id=:position_id");
   $statement->bindParam(':department_id', $department_id);
+  $statement->bindParam(':position_id', $position_id);
   $statement->execute(); 
   if($statement->rowCount()>0){
     $error = true;
-    $_SESSION["msg"] = '<div class="alert alert-dismissible alert-warning bg-gradient-warning text-white"><button type="button" class="close" data-dismiss="alert">&times;</button>Bank Name Already existing.</div>';
+    $_SESSION["msg"] = '<div class="alert alert-dismissible alert-warning bg-gradient-warning text-white"><button type="button" class="close" data-dismiss="alert">&times;</button>Already existing.</div>';
   }
 
   if (!$error) {
     $data = array(
         ':department_id'  =>  strtoupper($_POST['department_id']),
         ':position_id'  =>  $_POST['position_id'],
-        ':shifts'  =>  strtoupper($_POST['shifts']),
-        
+        ':shifts'  =>  strtoupper($_POST['shifts']),        
     );
    
     $query = "

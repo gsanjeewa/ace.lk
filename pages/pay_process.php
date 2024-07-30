@@ -990,7 +990,7 @@ WHERE
 
       $data_uniform = array(
         ':id'     =>  $uniform_id[$j],
-        ':status' =>  $inventory_ded,
+        ':status' =>  1,
       );
 
       $query_uniform = "
