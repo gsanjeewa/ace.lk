@@ -22,6 +22,7 @@ RewriteRule ^employee_list/employee/([-\w]+)/(\d+)$ pages/emp_history_employee.p
 RewriteRule ^datatable_emp$ pages/datatable_emp.php [NC,L]
 RewriteRule ^check_employee_no$ pages/emp_check_employee_no.php [NC,L]
 RewriteRule ^check_employee_id$ pages/emp_check_employee_id.php [NC,L]
+RewriteRule ^check_employee_id_d$ pages/emp_check_employee_id_d.php [NC,L]
 RewriteRule ^check_employee_id2$ pages/emp_check_employee_id2.php [NC,L]
 RewriteRule ^employee_no$ pages/emp_employee_no.php [NC,L]
 RewriteRule ^employee_no2$ pages/emp_employee_no2.php [NC,L]

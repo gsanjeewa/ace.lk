@@ -400,7 +400,7 @@ include '../inc/header.php';
                 <!-- /.card-body -->
 
                 <div class="card-footer change_btn" >
-                  <button class="btn btn-sm btn-primary col-sm-3 offset-md-3" name="add_save"> Save</button>
+                  <button class="btn btn-sm btn-primary col-sm-3 offset-md-3" type="submit" name="add_save"> Save</button>
                   <button class="btn btn-sm btn-default col-sm-3" type="reset"> Cancel</button>
                 </div>
 
