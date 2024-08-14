@@ -239,6 +239,10 @@ include '../inc/header.php';
                           $type='Nomal Rate included Half Days, Poya & Mercantile';
                         elseif($row['shifts']==5):
                           $type='Total Shifts';
+                        elseif($row['shifts']==6):
+                          $type='Nomal Rate Max OT 60 & included Half Days';
+                        elseif($row['shifts']==7):
+                          $type='8 Shift Rate';
                         endif;                    
 
 

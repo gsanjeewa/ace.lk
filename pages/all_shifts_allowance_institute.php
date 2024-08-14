@@ -15,48 +15,72 @@ if (checkPermissions($_SESSION["user_id"], 85) == "false") {
 $error = false;
 
 if (isset($_POST['add_new'])) {
-    if (checkPermissions($_SESSION["user_id"], 83) == "false") {
-        $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>'; 
-        header('location:/allowance_list/shifts_allowance_institute');   
-        exit();
-    }
+  if (checkPermissions($_SESSION["user_id"], 83) == "false") {
+      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>'; 
+      header('location:/allowance_list/shifts_allowance_institute');   
+      exit();
+  }
 
-    if (!$error) {
-        // Start a transaction
-        $connect->beginTransaction();
+  if (!$error) {
+      // Start a transaction
+      $connect->beginTransaction();
 
-        try {
-            $query = "
-                INSERT INTO shifts_allowance_institute (department_id, position_id, allowance, total_shifts)
-                VALUES (:department_id, :position_id, :allowance, :total_shifts)
-            ";
-            $statement = $connect->prepare($query);
+      try {
+          $query = "
+              INSERT INTO shifts_allowance_institute (department_id, position_id, allowance, total_shifts)
+              VALUES (:department_id, :position_id, :allowance, :total_shifts)
+          ";
+          $statement = $connect->prepare($query);
 
-            // Iterate through the arrays and insert each row
-            for ($i = 0; $i < count($_POST['position_id']); $i++) {
-                $statement->execute(array(
-                    ':department_id' => $_POST['department_id'],
-                    ':position_id' => $_POST['position_id'][$i],
-                    ':allowance' => $_POST['allowance'],
-                    ':total_shifts' => $_POST['total_shifts']
-                ));
-            }
+          // Initialize counters
+          $insertCount = 0;
+          $duplicateCount = 0;
 
-            // Commit the transaction
-            $connect->commit();
+          // Iterate through the arrays and insert each row
+          for ($i = 0; $i < count($_POST['position_id']); $i++) {
+              // Check for duplicates
+              $checkQuery = "
+                  SELECT COUNT(*) 
+                  FROM shifts_allowance_institute 
+                  WHERE department_id = :department_id AND position_id = :position_id
+              ";
+              $checkStatement = $connect->prepare($checkQuery);
+              $checkStatement->execute(array(
+                  ':department_id' => $_POST['department_id'],
+                  ':position_id' => $_POST['position_id'][$i]
+              ));
+              $count = $checkStatement->fetchColumn();
 
-            $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span class="glyphicon glyphicon-info-sign"></span>Success.</div>'; 
-        } catch (Exception $e) {
-            // Rollback the transaction if something went wrong
-            $connect->rollBack();
-            $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <i class="fas fa-fw fa-times"></i>Can not Save. Error: ' . $e->getMessage() . '</div>';
-        }
-    }
+              if ($count == 0) {
+                  // Insert only if no duplicate exists
+                  $statement->execute(array(
+                      ':department_id' => $_POST['department_id'],
+                      ':position_id' => $_POST['position_id'][$i],
+                      ':allowance' => $_POST['allowance'],
+                      ':total_shifts' => $_POST['total_shifts']
+                  ));
+                  $insertCount++;
+              } else {
+                  $duplicateCount++;
+              }
+          }
+
+          // Commit the transaction
+          $connect->commit();
+
+          $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <span class="glyphicon glyphicon-info-sign"></span> Success. ' . $insertCount . ' rows inserted. ' . $duplicateCount . ' duplicates found.</div>'; 
+      } catch (Exception $e) {
+          // Rollback the transaction if something went wrong
+          $connect->rollBack();
+          $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <i class="fas fa-fw fa-times"></i>Cannot Save. Error: ' . $e->getMessage() . '</div>';
+      }
+  }
 }
+
 
 if(isset($_POST['insert']))
 {

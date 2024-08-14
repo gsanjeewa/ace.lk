@@ -235,7 +235,8 @@ WHERE
 
       }
 
-      $total_shifts=(string)$total_shifts_12+(string)$total_shifts_8;
+      $total_shifts=(int)$total_shifts_12+(int)$total_shifts_8;
+    
 
       $statement = $connect->prepare("SELECT COALESCE(sum(extra_ot_hrs),'0') AS total_extra FROM attendance WHERE start_date = '".$date_from."' AND end_date = '".$date_to."' AND employee_id='".$employee_id."' AND (attendance_status=0 OR attendance_status=2)");
       $statement->execute();
@@ -372,18 +373,49 @@ WHERE
           $total_shifts_any_emp_amount=0;
         }
 
-      //-----------------Shifts Allowance Details------------------------//
+      
+        //-----------------Shifts Allowance Details------------------------//
 
-      $statement = $connect->prepare("SELECT COALESCE(sum(a.no_of_shifts * b.allowance),'0') AS total_amount FROM attendance a INNER JOIN shifts_allowance_institute b ON a.department_id = b.department_id AND a.position_id=b.position_id WHERE a.start_date = '".$date_from."' AND a.end_date = '".$date_to."' AND a.employee_id='".$employee_id."' AND (a.attendance_status=0 OR a.attendance_status=2) AND b.status=0 AND b.total_shifts <= '".$total_shifts."' ORDER BY b.id DESC LIMIT 1");    
-
-      $statement->execute();
-      $result = $statement->fetchAll();
-      foreach($result as $row_shifts_institute){
-
-        $shifts_allowance_institute=$row_shifts_institute['total_amount'];
-        
-      }
-
+        $statement = $connect->prepare("
+        SELECT COALESCE(SUM(a.no_of_shifts * latest.allowance), 0) AS total_amount
+        FROM attendance a
+        INNER JOIN (
+            SELECT sai.*
+            FROM shifts_allowance_institute sai
+            INNER JOIN (
+                SELECT department_id, position_id, MAX(id) AS last_id
+                FROM shifts_allowance_institute
+                GROUP BY department_id, position_id
+            ) latest_records ON sai.id = latest_records.last_id
+        ) latest ON a.department_id = latest.department_id AND a.position_id = latest.position_id
+        WHERE latest.total_shifts <= :total_shifts
+          AND a.start_date = :date_from
+          AND a.end_date = :date_to
+          AND a.employee_id = :employee_id
+          AND (a.attendance_status = 0 OR a.attendance_status = 2)
+          AND latest.status = 0
+    ");
+    
+    // Bind the parameters
+    $statement->bindParam(':total_shifts', $total_shifts, PDO::PARAM_INT);
+    $statement->bindParam(':date_from', $date_from);
+    $statement->bindParam(':date_to', $date_to);
+    $statement->bindParam(':employee_id', $employee_id);
+    
+    // Execute the statement
+    $statement->execute();
+    
+    // Fetch the result
+    $result_shifts = $statement->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Process the result
+    if ($statement->rowCount() > 0) {
+        foreach ($result_shifts as $row_shifts_institute) {
+            $shifts_allowance_institute = $row_shifts_institute['total_amount'];
+        }
+    } else {
+        $shifts_allowance_institute = 0;
+    }
 
       //-----------------Promotion Pay Details------------------------//
 
@@ -488,7 +520,7 @@ WHERE
         $statement->execute();
         $result = $statement->fetchAll();        
         foreach($result as $fines_deductions_id){             
-          $fines_id[]=$fines_deductions_id['id'];            
+          $fines_id[]=$fines_deductions_id['id'];
         }
 
       //-----------------Pending Deductions Details------------------------//

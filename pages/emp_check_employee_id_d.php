@@ -23,7 +23,7 @@ if (isset($_REQUEST["nic_old1"])) {
     $query .= "WHERE e.nic_no = '".$_REQUEST["nic_old1"]."'";
 }
 
-$query .= "AND (j.employee_status BETWEEN 0 AND 2)";
+// $query .= "AND (j.employee_status BETWEEN 0 AND 2)";
 
 $statement = $connect->prepare($query);
 
