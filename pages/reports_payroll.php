@@ -74,7 +74,7 @@ include '../inc/header.php';
           <div class="container box">
    <h3 align="center">Payroll</h3>
    <br />
-   <form method="POST" target="_blank" id="add_deduction_form" action="/reports/payroll_print_depatments">
+   <form method="POST" target="_blank" id="add_deduction_form" action="/reports/payroll_print_depatment">
    <div class="row">    
     <div class="col-md-4">
       <div class="form-group">

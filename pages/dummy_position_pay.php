@@ -24,7 +24,7 @@ if(isset($_POST['add_new']))
 
   $department_id =  $_POST['department_id'];
   $position_id =  $_POST['position_id'];
-  $statement = $connect->prepare("SELECT department_id, position_id FROM position_pay WHERE department_id=:department_id AND position_id=:position_id");
+  $statement = $connect->prepare("SELECT department_id, position_id FROM d_position_pay WHERE department_id=:department_id AND position_id=:position_id");
   $statement->bindParam(':department_id', $department_id);
   $statement->bindParam(':position_id', $position_id);
 
