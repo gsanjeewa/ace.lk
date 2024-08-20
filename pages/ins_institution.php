@@ -169,6 +169,69 @@ include '../inc/header.php';
                             $result = $statement->fetchAll();
 
                             foreach($result as $row_p):
+
+                              $date_effective = date("Y-m");
+                              $year = date("Y");
+                              $month = date("m");
+
+                              $lastmonth = date('m', strtotime("-1 month"));
+
+                              $query_advance = 'SELECT * FROM salary_advance WHERE department_id = :department_id AND YEAR(date_effective) = :year AND MONTH(date_effective) = :month';
+
+                              $statement = $connect->prepare($query_advance);
+                              $statement->execute([
+                                  ':department_id' => $row_p['department_id'],
+                                  ':year' => $year,
+                                  ':month' => $month,
+                              ]);
+
+                              $total_data_advance = $statement->rowCount();
+
+                              $query_attendance = 'SELECT * FROM attendance WHERE department_id = :department_id AND YEAR(start_date) = :year AND MONTH(start_date) = :lastmonth';
+
+                              $statement = $connect->prepare($query_attendance);
+                              $statement->execute([
+                                  ':department_id' => $row_p['department_id'],
+                                  ':year' => $year,
+                                  ':lastmonth' => $lastmonth,
+                              ]);
+
+                              $total_data_attendance = $statement->rowCount();
+
+                              $query_hostel = 'SELECT * FROM employee_deductions WHERE department_id = :department_id AND YEAR(effective_date) = :year AND MONTH(effective_date) = :lastmonth AND deduction_id=1';
+
+                              $statement = $connect->prepare($query_hostel);
+                              $statement->execute([
+                                  ':department_id' => $row_p['department_id'],
+                                  ':year' => $year,
+                                  ':lastmonth' => $lastmonth,
+                              ]);
+
+                              $total_data_hostel = $statement->rowCount();
+
+                              $query_ration = 'SELECT * FROM ration_deduction WHERE department_id = :department_id AND YEAR(date_effective) = :year AND MONTH(date_effective) = :lastmonth';
+
+                              $statement = $connect->prepare($query_ration);
+                              $statement->execute([
+                                  ':department_id' => $row_p['department_id'],
+                                  ':year' => $year,
+                                  ':lastmonth' => $lastmonth,
+                              ]);
+
+                              $total_data_ration = $statement->rowCount();
+
+                              $query_fines = 'SELECT * FROM employee_deductions WHERE department_id = :department_id AND YEAR(effective_date) = :year AND MONTH(effective_date) = :lastmonth AND deduction_id=2';
+
+                              $statement = $connect->prepare($query_fines);
+                              $statement->execute([
+                                  ':department_id' => $row_p['department_id'],
+                                  ':year' => $year,
+                                  ':lastmonth' => $lastmonth,
+                              ]);
+
+                              $total_data_fines = $statement->rowCount();
+
+
                               ?>
 
                             <tr>
@@ -176,20 +239,13 @@ include '../inc/header.php';
                                 <?php echo $row_p['department_name'].' - '.$row_p['department_location']; ?>
                               </td>
                               <td>
-                                <?php
-
-                                $query_advance = 'SELECT * FROM department WHERE sector_id="'.$row['sector_id'].'" AND department_status = 0 ORDER BY department_status ASC, department_name ASC';
-
-                                $statement = $connect->prepare($query_p);
-                                $statement->execute();
-                                $total_data = $statement->rowCount();
-                                $result = $statement->fetchAll();
-    
-                                foreach($result as $row_p):
-
-                                  
-                                endforeach
-                                ?>
+                                <dl>
+                                  <dd>Attendance <?php echo '('.$total_data_attendance.')'; ?> </dd>
+                                  <dd>Advance <?php echo '('.$total_data_advance.')'; ?></dd>
+                                  <dd>Hostel <?php echo '('.$total_data_hostel.')'; ?></dd>
+                                  <dd>Ration <?php echo '('.$total_data_ration.')'; ?></dd>
+                                  <dd>Fines <?php echo '('.$total_data_fines.')'; ?></dd>
+                                </dl>                                
                               </td>
                               <td style="width:50%;">
                           <center>
