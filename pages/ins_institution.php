@@ -138,7 +138,8 @@ include '../inc/header.php';
                     <tr>
                       <th><center>#</center></th>
                       <th><center>Sector</center></th>
-                      <th><center>Institution</center></th>                      
+                      <th><center>Institution</center></th>
+                      <th>Status</th>
                     </tr>                    
                   </thead>
                   <tbody>
@@ -173,6 +174,22 @@ include '../inc/header.php';
                             <tr>
                               <td style="width:50%;">
                                 <?php echo $row_p['department_name'].' - '.$row_p['department_location']; ?>
+                              </td>
+                              <td>
+                                <?php
+
+                                $query_advance = 'SELECT * FROM department WHERE sector_id="'.$row['sector_id'].'" AND department_status = 0 ORDER BY department_status ASC, department_name ASC';
+
+                                $statement = $connect->prepare($query_p);
+                                $statement->execute();
+                                $total_data = $statement->rowCount();
+                                $result = $statement->fetchAll();
+    
+                                foreach($result as $row_p):
+
+                                  
+                                endforeach
+                                ?>
                               </td>
                               <td style="width:50%;">
                           <center>
