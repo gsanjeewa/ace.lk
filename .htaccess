@@ -59,6 +59,8 @@ RewriteRule ^allowance_list/shifts_allowance_emp$ pages/all_shifts_allowance_emp
 RewriteRule ^edit_shifts_allowance_emp$ pages/all_shifts_allowance_emp_edit.php [NC,L]
 RewriteRule ^allowance_list/shifts_allowance_institute$ pages/all_shifts_allowance_institute.php [NC,L]
 RewriteRule ^edit_shifts_allowance_institute$ pages/all_shifts_allowance_institute_edit.php [NC,L]
+RewriteRule ^allowance_list/shifts_rate$ pages/all_shifts_rate.php [NC,L]
+RewriteRule ^edit_shifts_rate$ pages/all_shifts_rate_edit.php [NC,L]
 
 #deduction
 RewriteRule ^deduction_list/deduction$ pages/ded_deduction.php [NC,L]
@@ -318,8 +320,7 @@ RewriteRule ^settings/sector_list$ pages/settings_sector_list.php [NC,L]
 RewriteRule ^edit_sector$ pages/settings_sector_name.php [NC,L]
 RewriteRule ^settings/invoice_rate$ pages/settings_invoice_rate.php [NC,L]
 RewriteRule ^edit_invoice_rate$ pages/settings_invoice_rate_edit.php [NC,L]
-RewriteRule ^settings/shifts_rate$ pages/settings_shifts_rate.php [NC,L]
-RewriteRule ^edit_shifts_rate$ pages/settings_shifts_rate_edit.php [NC,L]
+
 
 
 #users

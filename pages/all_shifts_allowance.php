@@ -189,7 +189,7 @@ include '../inc/header.php';
             
               <div class="card card-success">
                 <div class="card-header">
-                  <h3 class="card-title">Shifts Rate</h3>
+                  <h3 class="card-title">Shifts Rate Institute</h3>
                   <button class="edit_data4 btn btn-sm bg-gradient-primary float-right" type="button" ><i class="fas fa-plus"></i> Add</button>                
                 </div>
                   <!-- /.card-header -->

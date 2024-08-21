@@ -292,7 +292,7 @@ foreach($result as $row_users)
               <li class="nav-item">
                 <a href="/allowance_list/shifts_allowance" class="nav-link <?= ($second_part == 'shifts_allowance') ? 'active':''; ?>">
                   <i class="far fa-circle nav-icon text-secondary"></i>
-                  <p>Shifts Allowance</p>
+                  <p>Shifts Institute</p>
                 </a>
               </li>
               <?php
@@ -303,7 +303,7 @@ foreach($result as $row_users)
               <li class="nav-item">
                 <a href="/allowance_list/shifts_allowance_emp" class="nav-link <?= ($second_part == 'shifts_allowance_emp') ? 'active':''; ?>">
                   <i class="far fa-circle nav-icon text-info"></i>
-                  <p>Shifts Allowance Emp</p>
+                  <p>Shifts Employee</p>
                 </a>
               </li>
               <?php
@@ -313,11 +313,22 @@ foreach($result as $row_users)
                 ?>
                 <li class="nav-item">
                   <a href="/allowance_list/shifts_allowance_institute" class="nav-link <?= ($second_part == 'shifts_allowance_institute') ? 'active':''; ?>">
-                    <i class="far fa-circle nav-icon text-info"></i>
-                    <p>Shifts Allowance Institute</p>
+                    <i class="far fa-circle nav-icon text-danger"></i>
+                    <p>Shifts Institute Position</p>
                   </a>
                 </li>
                 <?php
+                }
+
+                if (checkPermissions($_SESSION["user_id"], 37) == "true") {
+                  ?>
+                  <li class="nav-item">
+                    <a href="/allowance_list/shifts_rate" class="nav-link <?= ($second_part == 'shifts_rate') ? 'active':''; ?>">
+                      <i class="far fa-circle nav-icon text-warning"></i>
+                      <p>Shifts Rate (Max)</p>
+                    </a>
+                  </li>
+                  <?php
                 }
               ?>
             </ul>
@@ -1178,16 +1189,7 @@ foreach($result as $row_users)
                 <?php
                 }
 
-                if (checkPermissions($_SESSION["user_id"], 37) == "true") {
-              ?>
-              <li class="nav-item">
-                <a href="/settings/shifts_rate" class="nav-link <?= ($second_part == 'shifts_rate') ? 'active':''; ?>">
-                  <i class="far fa-circle nav-icon text-danger"></i>
-                  <p>Shifts Rate</p>
-                </a>
-              </li>
-              <?php
-              }            
+                     
 
                 ?>             
               </ul>
