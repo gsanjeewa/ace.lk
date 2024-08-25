@@ -176,7 +176,6 @@ include '../inc/header.php';
                         <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']; ?>">
                         <button class="btn btn-primary btn-sm btn-block col-md-2 float-right" name="calculate_payroll" id="calculate_payroll" type="submit" data-toggle="tooltip" data-placement="top" title="Calculate"><i class="fas fa-calculator"></i> Re-Caclulate Payroll</button>
 
-                        <!-- <button class="btn btn-primary btn-sm btn-block col-md-2 float-right" type="button" id="new_payroll_btn"><span class="fa fa-plus"></span> Re-Caclulate Payroll</button> -->
                     </form>
                     <?php
                   }
@@ -195,7 +194,6 @@ include '../inc/header.php';
                     <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']; ?>">
                     <button class="btn btn-sm btn-outline-success" name="all_approved" id="approved" type="submit" data-toggle="tooltip" data-placement="top" title="All Approved" ><i class="fa fa-check"></i> All Approved</button>
 
-                  <!-- <a href="/payroll_list/print/<?php echo $_GET['view'] ?>" target="_blank" class="btn btn-sm btn-outline-primary pull-right" data-toggle="tooltip" data-placement="top" title="Print Payslip"><i class="fas fa-print"> Print</i></a> -->
                   </form>
                   <?php
                   }}
@@ -360,6 +358,14 @@ include '../inc/header.php';
 
                             <td>
                               <center>
+                              <form method="POST" class="employee_calculate_form">
+                                <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']; ?>">
+                                <input type="hidden" name="payroll_item_id" value="<?php echo $row['id']?>">
+                                <input type="hidden" name="employee_id" value="<?php echo $row['employee_id']?>">
+                                <button class="btn btn-outline-primary btn-sm calculate_payroll_employee" name="calculate_payroll_employee" type="submit" data-toggle="tooltip" data-placement="top" title="Calculate"><i class="fas fa-calculator"></i></button>
+                            </form>
+
+                            
                                 <form method="POST" id="" action="">
                                   <input type="hidden" name="payroll_id" value="<?php echo $row['id']?>">
                                   <input type="hidden" name="employee_id" value="<?php echo $row['employee_id']?>">
@@ -585,133 +591,89 @@ include '../inc/footer.php';
  
  $(document).ready(function(){
 
-  $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": true,
-      "searching": true,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": false,
-      "scrollX": true,
-    });
+$('#example2').DataTable({
+  "paging": true,
+  "lengthChange": true,
+  "searching": true,
+  "ordering": true,
+  "info": true,
+  "autoWidth": false,
+  "responsive": false,
+  "scrollX": true,
+});
 
-  $('.view_payslip').click(function(){
-      var $id=$(this).attr('data-id');
-      location.href = "/payroll_list/payroll/pay_slip/"+$id;      
-    });
-    
-  $('#sample_form').on('submit', function(event){
-   event.preventDefault();   
-    $.ajax({
-     url:"/process_approved",
-     method:"POST",
-     data:$(this).serialize(),
-     beforeSend:function()
-     {
-      $('#approved').attr('disabled', 'disabled');
-      $('#process').css('display', 'block');
-     },
-     success:function(data)
-     {
-      var percentage = 0;
+$('.view_payslip').click(function(){
+  var $id = $(this).attr('data-id');
+  location.href = "/payroll_list/payroll/pay_slip/" + $id;
+});
 
-      var timer = setInterval(function(){
-       percentage = percentage + 20;
-       progress_bar_process(percentage, timer);
-      }, 1000);
-     }
-    })
-   
-  });
-
-  function progress_bar_process(percentage, timer)
-  {
-   $('.progress-bar').css('width', percentage + '%');
-   if(percentage > 100)
-   {
-    clearInterval(timer);
-    $('#sample_form')[0].reset();
-    $('#process').css('display', 'none');
-    $('.progress-bar').css('width', '0%');
-    $('#approved').attr('disabled', false);
-    $('#success_message').html('<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><span class="glyphicon glyphicon-info-sign"></span>Success.</div>');
-    setTimeout(function(){
-     $('#success_message').html('');
-     location.reload();
-    }, 2000);
-   }
-  } 
-
-//re calculate payrole
-  $('#re_calculate_form').on('submit', function(event){
-   event.preventDefault();   
-    $.ajax({
-     url:"/process",
-     method:"POST",
-     data:$(this).serialize(),
-     beforeSend:function()
-     {
-      $('#calculate_payroll').attr('disabled', 'disabled');
-      $('#process').css('display', 'block');
-     },
-     success:function(data)
-     {
-      var percentage = 0;
-
-      var timer = setInterval(function(){
-       percentage = percentage + 20;
-       progress_bar_process_recal(percentage, timer);
-      }, 1000);
-     }
-    })
-   
-  });
-
-  function progress_bar_process_recal(percentage, timer)
-  {
-   $('.progress-bar').css('width', percentage + '%');
-   if(percentage > 100)
-   {
-    clearInterval(timer);
-    $('#re_calculate_form')[0].reset();
-    $('#process').css('display', 'none');
-    $('.progress-bar').css('width', '0%');
-    $('#calculate_payroll').attr('disabled', false);
-    $('#success_message').html('<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><span class="glyphicon glyphicon-info-sign"></span>Success.</div>');
-    setTimeout(function(){
-     $('#success_message').html('');
-     location.reload();
-    }, 2000);
-   }
-  }
-
-
-  $(function () {
-      $('[data-toggle="tooltip"]').tooltip()
-    });
-
- });
-</script>
-
-<script type="text/javascript">
-    $(document).ready(function(){
-      $(document).on('click','.edit_data4',function(){
-        $("#editData4").modal({
-          backdrop: 'static',
-          keyboard: false
-        });
-        var edit_id4=$(this).attr('data-id');
-        var payroll_id = <?php echo $_GET['view']; ?>;
+function setupFormSubmission(formSelector, submitUrl, buttonSelector) {
+    $(document).on('submit', formSelector, function(event) {
+        event.preventDefault();
+        var $form = $(this);
         $.ajax({
-          url:"/halt_reason",
-          type:"post",
-          data:{edit_id4:edit_id4, payroll_id:payroll_id},
-          success:function(data){
-            $("#info_update4").html(data);
-            $("#editData4").modal('show');
-          }
+            url: submitUrl,
+            method: "POST",
+            data: $form.serialize(),
+            beforeSend: function() {
+                $form.find(buttonSelector).attr('disabled', 'disabled');
+                $('#process').css('display', 'block');
+            },
+            success: function(data) {
+                var percentage = 0;
+                var timer = setInterval(function() {
+                    percentage += 20;
+                    progress_bar_process(percentage, timer, formSelector, buttonSelector);
+                }, 1000);
+            }
         });
-      });
     });
+}
+
+
+
+
+function progress_bar_process(percentage, timer, formSelector, buttonSelector) {
+  $('.progress-bar').css('width', percentage + '%');
+  if (percentage > 100) {
+    clearInterval(timer);
+    $(formSelector)[0].reset();
+    $('#process').css('display', 'none');
+    $('.progress-bar').css('width', '0%');
+    $(buttonSelector).attr('disabled', false);
+    $('#success_message').html('<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><span class="glyphicon glyphicon-info-sign"></span>Success.</div>');
+    setTimeout(function() {
+      $('#success_message').html('');
+      location.reload();
+    }, 2000);
+  }
+}
+
+setupFormSubmission('#sample_form', '/process_approved', '#approved');
+setupFormSubmission('#re_calculate_form', '/process_employee', '#calculate_payroll');
+setupFormSubmission('.employee_calculate_form', '/process_employee', '.calculate_payroll_employee');
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+});
+
+$(document).on('click', '.edit_data4', function(){
+  $("#editData4").modal({
+    backdrop: 'static',
+    keyboard: false
+  });
+  var edit_id4 = $(this).attr('data-id');
+  var payroll_id = <?php echo json_encode($view); ?>; // Use Laravel's output sanitization
+  $.ajax({
+    url: "/halt_reason",
+    type: "POST",
+    data: {edit_id4: edit_id4, payroll_id: payroll_id},
+    success: function(data){
+      $("#info_update4").html(data);
+      $("#editData4").modal('show');
+    }
+  });
+});
+});
+
   </script>

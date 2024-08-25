@@ -65,79 +65,51 @@ include '../inc/header.php';
                 <!-- /.card-header -->
               <div class="card-body">
                 <?php
-                /*$query = 'SELECT position_pay.position_pay_id, position_pay.position_payment, department.department_name, position.position_abbreviation FROM position_pay INNER JOIN department ON position_pay.department_id=department.department_id INNER JOIN position ON position_pay.position_id=position.position_id ORDER BY position_pay.position_pay_id';*/
-                $query = 'SELECT a.position_payment, b.department_name, a.department_id, b.department_location FROM position_pay a INNER JOIN department b ON a.department_id=b.department_id WHERE b.department_status=0 GROUP BY a.department_id ORDER BY a.department_id';
+                
+                
+                $query = 'SELECT a.position_payment, b.department_name, a.department_id, b.department_location, a.effected_date, c.position_abbreviation 
+                          FROM position_pay a 
+                          INNER JOIN department b ON a.department_id = b.department_id 
+                          INNER JOIN position c ON a.position_id = c.position_id
+                          WHERE b.department_status = 0 
+                          ORDER BY a.department_id ASC';
                 $statement = $connect->prepare($query);
                 $statement->execute();
-                $total_data = $statement->rowCount();
                 $result = $statement->fetchAll();
-
                 ?>
+
                 <table class="table table-sm table-hover" id="example2">
                   <thead>
                     <tr>
                       <th>#</th>
                       <th>Institution Name</th>
-                      <th>Position Payment</th>                      
-                    </tr>                    
+                      <th>Position</th>
+                      <th>Payment</th>
+                      <th>Effected Date</th>
+                    </tr>
                   </thead>
                   <tbody>
                     <?php
-                    $startpoint =0;
+                    $startpoint = 0;
                     $sno = $startpoint + 1;
-                    foreach($result as $row)
-                    {
-                      ?>
-                      <tr>
-                        <td><?php echo $sno; ?></td>
-                        <td><?php echo $row['department_name'].'-'.$row['department_location']; ?></td>
-                        <td>
-                          <table>
-                            <?php 
-                       $query = 'SELECT a.position_pay_id, b.position_abbreviation, a.position_payment FROM position_pay a INNER JOIN position b ON a.position_id=b.position_id WHERE a.department_id="'.$row['department_id'].'"';
-
-                        $statement = $connect->prepare($query);
-                $statement->execute();
-                $total_data = $statement->rowCount();
-                $result = $statement->fetchAll();
-                
-                foreach($result as $row_p):
-                  ?>
-                  
+                    foreach ($result as $row) {
+                        $effected_date = $row['effected_date'] ? $row['effected_date'] : '';
+                    ?>
                     <tr>
-                      <td><?php echo $row_p['position_abbreviation'];?></td>
-                      <td><?php echo number_format($row_p['position_payment']);?></td>
-                      <td><center>
-                        <form action="" method="POST">  
-                        <input type="hidden" name="position_pay_id" value="<?php echo $row_p['position_pay_id']?>">
-
-                            <a href="/position_list/add_position_pay/<?php echo $row_p['position_pay_id']?>" class="btn btn-sm btn-outline-primary"><i class="fa fa-edit"></i></a>
-                    <button class="btn btn-sm btn-outline-danger remove_department" data-id="<?php echo $row_p['position_pay_id']?>" type="button"><i class="fa fa-trash"></i></button>                    
-                          </center>
-                                                   
-                    <!-- <button class="btn btn-sm btn-outline-danger" name="remove_deduction" type="submit"><i class="fa fa-trash"></i></button> -->
-                    </form>
-                          
-                        </td>
+                      <td><?php echo $sno; ?></td>
+                      <td><?php echo $row['department_name'].'-'.$row['department_location']; ?></td>
+                      <td><?php echo $row['position_abbreviation']; ?></td>
+                      <td><?php echo number_format($row['position_payment']); ?></td>
+                      <td><?php echo $effected_date; ?></td>      
                     </tr>
-                  
-                  <?php
-                  
-                  
-                  endforeach;
-                        ?></table>
-
-                        
-                        
-                                                    
-                  </td>
-                      </tr>
-                      <?php
-                      $sno ++;
+                    <?php
+                        $sno++;
                     }
                     ?>
                   </tbody>
                 </table>
+
+
               </div>
               <!-- /.card-body -->
             </div>
@@ -164,8 +136,8 @@ include '../inc/footer.php';
         "ordering": true,
         "info": true,
         "autoWidth": false,
-        "responsive": true,
-      });
+        "responsive": false
+    });
 
       $('.edit_position').click(function(){
         var $id=$(this).attr('data-id');

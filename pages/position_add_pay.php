@@ -22,13 +22,16 @@ if (checkPermissions($_SESSION["user_id"], 37) == "false") {
     header('location:/position_list/add_position_pay');
     exit();
 }
+  $effected_date=date('Y-m-d', strtotime($_POST['effected_date']));
+
   $department_id =  $_POST['department_id'];
   $position_id =  $_POST['position_id'];
   $position_payment =  $_POST['position_payment'];
-  $statement = $connect->prepare("SELECT department_id, position_id FROM position_pay WHERE department_id=:department_id AND position_id=:position_id AND position_payment=:position_payment");
+  $statement = $connect->prepare("SELECT department_id, position_id FROM position_pay WHERE department_id=:department_id AND position_id=:position_id AND position_payment=:position_payment AND effected_date=:effected_date");
   $statement->bindParam(':department_id', $department_id);
   $statement->bindParam(':position_id', $position_id);
   $statement->bindParam(':position_payment', $position_payment);
+  $statement->bindParam(':effected_date', $effected_date);
 
   $statement->execute();
   
@@ -42,12 +45,13 @@ if (checkPermissions($_SESSION["user_id"], 37) == "false") {
       $data = array(
           ':department_id'       =>  $_POST['department_id'],
           ':position_id'         =>  $_POST['position_id'],
-          ':position_payment'    =>  $_POST['position_payment'],          
+          ':position_payment'    =>  $_POST['position_payment'],
+          ':effected_date'    =>  $_POST['effected_date'],
       );
      
       $query = "
-      INSERT INTO `position_pay`(`department_id`, `position_id`, `position_payment`) 
-      VALUES (:department_id, :position_id, :position_payment)
+      INSERT INTO position_pay(department_id, position_id, position_payment, effected_date) 
+      VALUES (:department_id, :position_id, :position_payment, :effected_date)
       ";
               
       $statement = $connect->prepare($query);
@@ -63,36 +67,36 @@ if (checkPermissions($_SESSION["user_id"], 37) == "false") {
   }
 }
 
-if (isset($_POST['update_save'])){
+// if (isset($_POST['update_save'])){
 
-  if (checkPermissions($_SESSION["user_id"], 38) == "false") {
+//   if (checkPermissions($_SESSION["user_id"], 38) == "false") {
 
-    $_SESSION["msg"] ='<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>';
-    header('location:/position_list/add_position_pay/'.$_GET['edit'].'');
-    exit();
-  }
+//     $_SESSION["msg"] ='<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>';
+//     header('location:/position_list/add_position_pay/'.$_GET['edit'].'');
+//     exit();
+//   }
 
-  $data = array(
+//   $data = array(
 
-      ':department_id'       =>  $_POST['department_id'],
-      ':position_id'         =>  $_POST['position_id'],
-      ':position_payment'    =>  $_POST['position_payment'],      
+//       ':department_id'       =>  $_POST['department_id'],
+//       ':position_id'         =>  $_POST['position_id'],
+//       ':position_payment'    =>  $_POST['position_payment'],      
       
-  );
+//   );
 
-  $query = "UPDATE `position_pay` SET `department_id`=:department_id, `position_id`=:position_id, `position_payment`=:position_payment WHERE `position_pay_id`=".$_GET['edit']."";
+//   $query = "UPDATE `position_pay` SET `department_id`=:department_id, `position_id`=:position_id, `position_payment`=:position_payment WHERE `position_pay_id`=".$_GET['edit']."";
     
-  $statement = $connect->prepare($query);
+//   $statement = $connect->prepare($query);
 
-  if($statement->execute($data))
-  {
-     $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Success.</div>';
-    header('location:/position_list/position_pay');            
-  }else{
-      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
-  }
+//   if($statement->execute($data))
+//   {
+//      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Success.</div>';
+//     header('location:/position_list/position_pay');            
+//   }else{
+//       $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
+//   }
     
-}
+// }
 
 include '../inc/header.php';
 ?>
@@ -278,11 +282,26 @@ include '../inc/header.php';
                       ?>
                     </div>
                 </div>
+                <div class="row">
 
-                <div class="form-group">
-                  <label for="position_payment">Payment</label>
-                  <input type="text" class="form-control" id="position_payment" name="position_payment">
-                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="effected_date" class="control-label">Month</label>
+                    <div class="input-group date" id="reservationmonth" data-target-input="nearest">
+                        <input type="text" name="effected_date" id="effected_date" class="form-control datetimepicker-input" data-target="#reservationmonth" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm" data-mask value="<?php echo date('Y-m'); ?>" />
+                        <div class="input-group-append" data-target="#reservationmonth" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="position_payment">Payment</label>
+                    <input type="text" class="form-control" id="position_payment" name="position_payment">
+                  </div>
+                  </div>
+                    </div>
 
                 <!-- <div class="form-group">
                         <label for="no_of_shifts">Shifts</label>
