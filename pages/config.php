@@ -5,7 +5,7 @@ function pdoConnection() {
 
 
 
-        $db_name     = 'ace_db';
+        $db_name     = 'ace_db_1';
 
         $db_user     = 'root';
 

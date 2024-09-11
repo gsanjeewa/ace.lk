@@ -650,7 +650,7 @@ function progress_bar_process(percentage, timer, formSelector, buttonSelector) {
 }
 
 setupFormSubmission('#sample_form', '/process_approved', '#approved');
-setupFormSubmission('#re_calculate_form', '/process_employee', '#calculate_payroll');
+setupFormSubmission('#re_calculate_form', '/process', '#calculate_payroll');
 setupFormSubmission('.employee_calculate_form', '/process_employee', '.calculate_payroll_employee');
 
 $(function () {
@@ -663,7 +663,7 @@ $(document).on('click', '.edit_data4', function(){
     keyboard: false
   });
   var edit_id4 = $(this).attr('data-id');
-  var payroll_id = <?php echo json_encode($view); ?>; // Use Laravel's output sanitization
+  var payroll_id = <?php echo $_GET['view']; ?>; // Use Laravel's output sanitization
   $.ajax({
     url: "/halt_reason",
     type: "POST",

@@ -961,7 +961,7 @@ if($request == 9){
 				if ($row['status']==0) {
 					$action='<form action="" method="POST"><input type="hidden" name="att_id" value="'.$row['id'].'"><button class="btn btn-sm btn-outline-danger" name="remove_attendance"  data-toggle="tooltip" data-placement="top" title="Delete" type="submit"><i class="fa fa-trash"></i></button></form>';
 				}else{
-					$action='<span class="badge badge-success">Paid</span>';
+					$action='<span class="badge badge-success">Paid</span><form action="" method="POST"><input type="hidden" name="att_id" value="'.$row['id'].'"><button class="btn btn-sm btn-outline-danger" name="remove_attendance"  data-toggle="tooltip" data-placement="top" title="Delete" type="submit"><i class="fa fa-trash"></i></button></form>';
 				}
 
 				$data[] = array(
