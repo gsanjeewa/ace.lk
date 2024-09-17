@@ -616,7 +616,7 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 	            $total_data = $statement->rowCount();
 	            $result = $statement->fetchAll();
 	            foreach($result as $rows_d):
-	                $all_arr[$rows_d['department_id']] = $rows_d['department_name'];
+	                $all_arr[$rows_d['department_id']] = $rows_d['department_name'].'-'.$rows_d['department_location'];
 	            endforeach;
 
 	            $query = 'SELECT * FROM position';
@@ -628,10 +628,23 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 	            foreach($result as $rows_p):
 	                $all_arr2[$rows_p['position_id']] = $rows_p['position_abbreviation'];
 	            endforeach;
+
+	            
             
 	            foreach(json_decode($row['department']) as $m => $val):
+	            	
+	            	$query = 'SELECT * FROM position_pay WHERE position_id="'.$val->p_id.'" AND department_id='.$val->d_id.'';
+
+		            $statement = $connect->prepare($query);
+		            $statement->execute();
+		            $total_data = $statement->rowCount();
+		            $result = $statement->fetchAll();
+		            foreach($result as $rows_pay):
+		                
+		            endforeach;
+
 				?>					
-	    		<li class='d-flex justify-content-between align-items-center'><?php echo $all_arr[$val->d_id].' - '.$all_arr2[$val->p_id].' ('.$val->t_shifts.')';?><span class='badge badge-primary badge-pill'></span><span></span></li>
+	    		<li class='d-flex justify-content-between align-items-center'><?php echo $all_arr[$val->d_id].' - '.$all_arr2[$val->p_id].' ('.$val->t_shifts.'x'.$rows_pay['position_payment'].')';?><span class='badge badge-primary badge-pill'></span><span></span></li>
 		    	    		
 	                					
 			    <?php

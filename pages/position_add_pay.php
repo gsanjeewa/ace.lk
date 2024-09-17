@@ -16,56 +16,68 @@ $error = false;
 
 if (isset($_POST['add_save'])){
 
-if (checkPermissions($_SESSION["user_id"], 37) == "false") {
+  if (checkPermissions($_SESSION["user_id"], 37) == "false") {
+      $_SESSION["msg"] = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>';
+      header('location:/position_list/add_position_pay');
+      exit();
+  }
 
-    $_SESSION["msg"] ='<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>You do not have permissions.</div>';
-    header('location:/position_list/add_position_pay');
-    exit();
-}
-  $effected_date=date('Y-m-d', strtotime($_POST['effected_date']));
+  $effected_date = date('Y-m-d', strtotime($_POST['effected_date']));
+  $department_id = $_POST['department_id'];
+  $position_id = $_POST['position_id'];
+  $position_payment = $_POST['position_payment'];
 
-  $department_id =  $_POST['department_id'];
-  $position_id =  $_POST['position_id'];
-  $position_payment =  $_POST['position_payment'];
-  $statement = $connect->prepare("SELECT department_id, position_id FROM position_pay WHERE department_id=:department_id AND position_id=:position_id AND position_payment=:position_payment AND effected_date=:effected_date");
+  // Check if the record already exists
+  $statement = $connect->prepare("SELECT department_id, position_id FROM position_pay WHERE department_id=:department_id AND position_id=:position_id AND position_payment=:position_payment");
   $statement->bindParam(':department_id', $department_id);
   $statement->bindParam(':position_id', $position_id);
   $statement->bindParam(':position_payment', $position_payment);
-  $statement->bindParam(':effected_date', $effected_date);
-
-  $statement->execute();
   
-  if($statement->rowCount()>0){
-    $error = true;
+  $statement->execute();
+
+  if($statement->rowCount() > 0){
+      $error = true;
       $errMSG = '<div class="alert alert-dismissible alert-warning bg-gradient-warning text-white"><button type="button" class="close" data-dismiss="alert">&times;</button>Already existing.</div>';
   }
 
-   if (!$error) {
+  if (!$error) {
+      // Update the status of the previous record
+      $updateQuery = "
+          UPDATE position_pay 
+          SET position_pay_status = 1 
+          WHERE department_id = :department_id 
+          AND position_id = :position_id 
+          ORDER BY effected_date DESC 
+          LIMIT 1
+      ";
+      $updateStmt = $connect->prepare($updateQuery);
+      $updateStmt->bindParam(':department_id', $department_id);
+      $updateStmt->bindParam(':position_id', $position_id);
+      $updateStmt->execute();
 
+      // Insert the new record
       $data = array(
-          ':department_id'       =>  $_POST['department_id'],
-          ':position_id'         =>  $_POST['position_id'],
-          ':position_payment'    =>  $_POST['position_payment'],
-          ':effected_date'    =>  $_POST['effected_date'],
+          ':department_id' => $department_id,
+          ':position_id' => $position_id,
+          ':position_payment' => $position_payment,
+          ':effected_date' => $effected_date,
       );
-     
+
       $query = "
       INSERT INTO position_pay(department_id, position_id, position_payment, effected_date) 
       VALUES (:department_id, :position_id, :position_payment, :effected_date)
       ";
-              
+
       $statement = $connect->prepare($query);
 
-      if($statement->execute($data))
-      {
-        $errMSG = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <span class="glyphicon glyphicon-info-sign"></span>Success.</div>';            
-      }else{
+      if($statement->execute($data)){
+          $errMSG = '<div class="alert alert-dismissible alert-success bg-gradient-success text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><span class="glyphicon glyphicon-info-sign"></span>Success.</div>';
+      } else {
           $errMSG = '<div class="alert alert-dismissible alert-danger bg-gradient-danger text-white"><button type="button" class="close" data-dismiss="alert">&times;</button><i class="fas fa-fw fa-times"></i>Can not Save.</div>';
       }
   }
 }
+
 
 // if (isset($_POST['update_save'])){
 

@@ -207,7 +207,7 @@ include '../inc/header.php';
 
                        
                            <?php
-                              $query="SELECT b.position_id, b.position_abbreviation, a.position_payment FROM position_pay a INNER JOIN position b ON a.position_id=b.position_id WHERE department_id='".$_GET['sal']."' ORDER BY position_id";
+                              $query="SELECT b.position_id, b.position_abbreviation, a.position_payment FROM position_pay a INNER JOIN position b ON a.position_id=b.position_id WHERE department_id='".$_GET['sal']."' AND a.position_pay_status = 0 ORDER BY b.priority ASC";
                               $statement = $connect->prepare($query);
                               $statement->execute();
                               $result = $statement->fetchAll();

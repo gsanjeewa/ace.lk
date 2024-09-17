@@ -71,8 +71,8 @@ include '../inc/header.php';
                           FROM position_pay a 
                           INNER JOIN department b ON a.department_id = b.department_id 
                           INNER JOIN position c ON a.position_id = c.position_id
-                          WHERE b.department_status = 0 
-                          ORDER BY a.department_id ASC';
+                          WHERE b.department_status = 0
+                          ORDER BY a.department_id ASC, c.priority ASC';
                 $statement = $connect->prepare($query);
                 $statement->execute();
                 $result = $statement->fetchAll();

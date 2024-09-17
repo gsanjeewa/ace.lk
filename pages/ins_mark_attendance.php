@@ -112,7 +112,7 @@ if ((isset($_POST['add_save'])) OR (isset($_POST['spl_save']))){
           ':position_id'    =>  $_POST['position_id'][$i],
           ':start_date'     =>  $start_date,
           ':end_date'       =>  $end_date,
-          ':shifts_type'   =>  $_POST['shifts_type'],
+          ':shifts_type'    =>  $_POST['shifts_type'],
           ':no_of_shifts'   =>  $_POST['no_of_shifts'][$i], 
           ':extra_ot_hrs'   =>  $_POST['extra_ot_hrs'][$i],
           ':poya_day'       =>  $_POST['poya_day'][$i],
@@ -546,7 +546,7 @@ include '../inc/header.php';
                           <div class="row">
                        
                            <?php
-                      $query="SELECT b.position_id, b.position_abbreviation, a.position_payment FROM position_pay a INNER JOIN position b ON a.position_id=b.position_id WHERE department_id='".$_GET['mark']."' ORDER BY position_id";
+                      $query="SELECT b.position_id, b.position_abbreviation, a.position_payment FROM position_pay a INNER JOIN position b ON a.position_id=b.position_id WHERE a.department_id='".$_GET['mark']."' AND a.position_pay_status = 0 ORDER BY b.priority ASC";
                       $statement = $connect->prepare($query);
                       $statement->execute();
                       $result = $statement->fetchAll();
