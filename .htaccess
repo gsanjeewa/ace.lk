@@ -128,6 +128,8 @@ RewriteRule ^payroll_list/duty_summary$ pages/pay_duty_summary.php [NC,L]
 RewriteRule ^payroll_list/duty_summary_depatment$ pages/pay_duty_summary_depatment.php [NC,L]
 RewriteRule ^payroll_list/att_tfr$ pages/pay_att_tfr.php [NC,L]
 RewriteRule ^tfr_process$ pages/pay_att_tfr_process.php [NC,L]
+RewriteRule ^payroll_list/pay_note_list$ pages/pay_note_list.php [NC,L]
+RewriteRule ^edit_pay_note$ pages/pay_note.php [NC,L]
 
 #loan
 RewriteRule ^loan/loan_list$ pages/loan_list.php [NC,L]

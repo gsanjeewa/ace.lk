@@ -652,6 +652,17 @@ foreach($result as $row_users)
               <?php
               }
 
+              if (checkPermissions($_SESSION["user_id"], 92) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/payroll_list/pay_note_list" class="nav-link <?= ($second_part == 'pay_note_list') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-danger"></i>
+                    <p>Pay Note List</p>
+                  </a>
+                </li>
+                <?php
+                }
+
               ?>
             </ul>
           </li>

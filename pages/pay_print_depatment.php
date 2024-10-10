@@ -618,7 +618,7 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 		</div>
 
 		<div class="row">
-			<div style="width: 100%; max-height: 150px;min-height: 150px;">
+			<div style="width: 100%; max-height: 140px;min-height: 140px;">
 				<?php
 	            $query = 'SELECT * FROM department' ;
 	            $statement = $connect->prepare($query);
@@ -664,7 +664,7 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 		</div>
 			<div class="row">
 
-			<div style="width: 100%; max-height: 200px;min-height: 200px;">
+			<div style="width: 100%; max-height: 150px;min-height: 150px;">
 				<h4 style="text-decoration: underline;"><b>මරණාධාර ගෙවිම්</b></h4>				
 				<?php
 		        /*$query = 'SELECT * FROM death_donation WHERE due_date BETWEEN "'.$date_from.'" AND "'.$date_to.'"';*/
@@ -695,6 +695,22 @@ if (checkPermissions($_SESSION["user_id"], 92) == "false") {
 			    	
 	                <?php
 	            endforeach;
+
+				?>
+			</div>
+		</div>
+		<div class="row">
+
+			<div style="width: 100%; max-height: 60px;min-height: 60px;">
+				<?php
+		        $query = "SELECT * FROM pay_note WHERE effective_date BETWEEN '".$date_from."' AND '".$date_to."'" ;
+				$statement = $connect->prepare($query);
+				$statement->execute();
+				$total_data = $statement->rowCount();
+				$result = $statement->fetchAll();
+				foreach($result as $rows):
+					echo $rows['note'];
+				endforeach;
 
 				?>
 			</div>
