@@ -58,7 +58,8 @@ include '../inc/header.php';
               ?>
             </div>
           <?php
-          }   
+          }
+
           ?>
         </div>
        
@@ -86,45 +87,65 @@ include '../inc/header.php';
                   <!-- /.card-header -->
                 <div class="card-body"> 
                   <form method="POST" id="sample_form">
+
+                  <div class="row">
                     <div class="col-md-12">
-                    <div class="form-group">
-                      <label for="effective_date" class="control-label">Month</label>
-                      <div class="input-group date" id="reservationmonth" data-target-input="nearest">
-                          <input type="text" name="effective_date" id="effective_date" class="form-control datetimepicker-input" data-target="#reservationmonth" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm" data-mask value="<?php echo date("Y-m"); ?>"/>
-                          <div class="input-group-append" data-target="#reservationmonth" data-toggle="datetimepicker">
-                              <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
-                          </div>
+                      <div class="form-group">
+                          <label for="effective_date" class="control-label">Month</label>
+                          <div class="input-group date" id="reservationmonth" data-target-input="nearest">
+                              <input type="text" name="effective_date" id="effective_date" class="form-control datetimepicker-input" data-target="#reservationmonth" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm" data-mask value="<?php echo date("Y-m"); ?>"/>
+                              <div class="input-group-append" data-target="#reservationmonth" data-toggle="datetimepicker">
+                                  <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                          <label for="ins_id">Institution</label>
+                          <select class="form-control select2" style="width: 100%;" name="ins_id" id="ins_id">
+                            <option value="">Select Institution</option>
+                            <?php
+                            $query="SELECT department_id, department_name, department_location FROM department WHERE department_status!=1 ORDER BY department_name ASC";
+                            $statement = $connect->prepare($query);
+                            $statement->execute();
+                            $result = $statement->fetchAll();
+                            foreach($result as $row)
+                            {
+                              ?>
+                              <option value="<?php echo $row['department_id']; ?>"><?php echo $row['department_name'].'- '.$row['department_location']; ?></option>
+                              <?php
+                            }
+                            ?>
+                          </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                  <label for="ins_id">Institution</label>
-                  <select class="form-control select2" style="width: 100%;" name="ins_id" id="ins_id">
-                    <option value="">Select Institution</option>
-                    <?php
-                    $query="SELECT b.department_id, b.department_name, b.department_location FROM d_shifts_rate a INNER JOIN department b ON a.department_id=b.department_id WHERE a.status!=1 ORDER BY b.department_name ASC";
-                    $statement = $connect->prepare($query);
-                    $statement->execute();
-                    $result = $statement->fetchAll();
-                    foreach($result as $row)
-                    {
-                      ?>
-                      <option value="<?php echo $row['department_id']; ?>"><?php echo $row['department_name'].'- '.$row['department_location']; ?></option>
-                      <?php
-                    }
-                    ?>
-                  </select>
-                </div>
-                <!-- checkbox -->
-                    <div class="form-group clearfix">                      
-                      <div class="icheck-success d-inline">
-                        <input type="checkbox" id="checkboxSuccess" name="extra_ot" value="1">
-                        <label for="checkboxSuccess">
-                          Extra OT
-                        </label>
-                      </div>
-                    </div>
 
-                    </div>
+                  </div>
+
+                  <div class="row">
+
+                  <div class="col-md-6">
+                    <div class="form-group clearfix">                      
+                        <div class="icheck-success d-inline">
+                          <input type="checkbox" id="extra_ot" name="extra_ot" value="1">
+                          <label for="extra_ot">
+                            Extra OT
+                          </label>
+                        </div>
+                      </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group clearfix">                      
+                        <div class="icheck-success d-inline">
+                          <input type="checkbox" id="total_shifts" name="total_shifts" value="1">
+                          <label for="total_shifts">
+                            Total Sfhits
+                          </label>
+                        </div>
+                      </div>
+                  </div>
+
+                </div>                    
                     <div class="col-md-12">                      
                       <button class="btn btn-sm btn-outline-success" name="calculate_payroll" id="calculate_payroll" type="submit" data-toggle="tooltip" data-placement="top" title="Tranfer"><i class="fas fa-calculator"></i> Transfer</button>
 

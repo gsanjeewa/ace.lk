@@ -786,21 +786,45 @@ foreach($result as $row_users)
               </li> 
               <?php
               }
+              
               if (checkPermissions($_SESSION["user_id"], 37) == "true") {
-              ?>
-              <li class="nav-item">
-                <a href="/dummy/d_shifts_rate" class="nav-link <?= ($second_part == 'd_shifts_rate') ? 'active':''; ?>">
-                  <i class="far fa-circle nav-icon text-success"></i>
-                  <p>Shifts Type</p>
-                </a>
-              </li>
-              <?php
+                ?>
+                <li class="nav-item">
+                  <a href="/dummy/shifts_type" class="nav-link <?= ($second_part == 'shifts_type') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-success"></i>
+                    <p>Shifts Type</p>
+                  </a>
+                </li>
+                <?php
               }
+
+              if (checkPermissions($_SESSION["user_id"], 37) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/dummy/half_days" class="nav-link <?= ($second_part == 'half_days') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-primary"></i>
+                    <p>Half Days</p>
+                  </a>
+                </li>
+                <?php
+              }
+
+              if (checkPermissions($_SESSION["user_id"], 37) == "true") {
+                ?>
+                <li class="nav-item">
+                  <a href="/dummy/shifts_rate_max" class="nav-link <?= ($second_part == 'shifts_rate_max') ? 'active':''; ?>">
+                    <i class="far fa-circle nav-icon text-secondary"></i>
+                    <p>Shifts Rate Max</p>
+                  </a>
+                </li>
+                <?php
+              }
+
               if (checkPermissions($_SESSION["user_id"], 39) == "true") {
               ?>
               <li class="nav-item">
                 <a href="/dummy/d_position_pay" class="nav-link <?= ($second_part == 'd_position_pay') ? 'active':''; ?>">
-                  <i class="far fa-circle nav-icon text-primary"></i>
+                  <i class="far fa-circle nav-icon text-info"></i>
                   <p>Position Pay</p>
                 </a>
               </li>
@@ -810,7 +834,7 @@ foreach($result as $row_users)
               ?>
               <li class="nav-item">
                 <a href="/dummy/d_ins_merge" class="nav-link <?= ($second_part == 'd_ins_merge') ? 'active':''; ?>">
-                  <i class="far fa-circle nav-icon text-primary"></i>
+                  <i class="far fa-circle nav-icon text-danger"></i>
                   <p>Institute Merge</p>
                 </a>
               </li>
@@ -820,7 +844,7 @@ foreach($result as $row_users)
                 ?>
                 <li class="nav-item">
                   <a href="/dummy/d_emp_allowance" class="nav-link <?= ($second_part == 'd_emp_allowance') ? 'active':''; ?>">
-                    <i class="far fa-circle nav-icon text-success"></i>
+                    <i class="far fa-circle nav-icon text-warning"></i>
                     <p>Employee Allowance</p>
                   </a>
                 </li>
@@ -830,7 +854,7 @@ foreach($result as $row_users)
                 ?>
                 <li class="nav-item">
                   <a href="/dummy/d_add_emp_allowance" class="nav-link <?= ($second_part == 'd_add_emp_allowance') ? 'active':''; ?>">
-                    <i class="far fa-circle nav-icon text-primary"></i>
+                    <i class="far fa-circle nav-icon text-success"></i>
                     <p>Add Employee Allowance</p>
                   </a>
                 </li>

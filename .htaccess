@@ -278,6 +278,14 @@ RewriteRule ^ins_backend-script$ pages/dummy_ins_backend-script.php [NC,L]
 RewriteRule ^dummy/d_emp_allowance$ pages/dummy_emp_allowances.php [NC,L]
 RewriteRule ^dummy/d_add_emp_allowance$ pages/dummy_add_emp_allowance.php [NC,L]
 
+RewriteRule ^dummy/shifts_type$ pages/dummy_shifts_type.php [NC,L]
+RewriteRule ^edit_shifts_type$ pages/dummy_shifts_type_edit.php [NC,L]
+
+RewriteRule ^dummy/half_days$ pages/dummy_half_days.php [NC,L]
+RewriteRule ^edit_half_days$ pages/dummy_half_days_edit.php [NC,L]
+
+RewriteRule ^dummy/shifts_rate_max$ pages/dummy_shifts_rate_max.php [NC,L]
+RewriteRule ^edit_shifts_rate_max$ pages/dummy_shifts_rate_max_edit.php [NC,L]
 
 
 #Death

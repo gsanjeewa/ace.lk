@@ -162,8 +162,6 @@ WHERE
           $dm_new = $shifts['shifts'];
         endforeach;
 
-
-
       endif;
 
     if($pay['type'] == 1){

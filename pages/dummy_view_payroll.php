@@ -15,7 +15,7 @@ if (checkPermissions($_SESSION["user_id"], 95) == "false") {
 }
 
 $institution = '';
-$query = "SELECT b.department_id, b.department_name, b.department_location FROM d_shifts_rate a INNER JOIN department b ON a.department_id=b.department_id ORDER BY b.department_name ASC";
+$query = "SELECT department_id, department_name, department_location FROM department WHERE department_status!=1  ORDER BY department_name ASC";
 $statement = $connect->prepare($query);
 $statement->execute();
 $result = $statement->fetchAll();
@@ -88,7 +88,7 @@ include '../inc/header.php';
     <div class="col-md-4"></div>
     <div class="col-md-4">
       <form method="POST" target="_blank" id="add_deduction_form" action="/dummy/payroll_print_depatment">
-      
+      <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']?>">
      <div class="form-group">
       <div class="input-group date" id="reservationmonth" data-target-input="nearest">
         <input type="text" name="effective_date" id="effective_date" class="form-control datetimepicker-input" data-target="#reservationmonth" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm" data-mask value="<?php echo date("Y-m"); ?>" required/>
@@ -109,15 +109,14 @@ include '../inc/header.php';
       </select>
      </div>
      <div class="form-group" align="center">
-      <button type="button" name="filter" id="filter" class="btn btn-info">Filter</button>
-      <button class="btn btn-primary"><i class="fas fa-print"></i> Print</button>
+      <button type="button" name="filter" id="filter" class="btn btn-info btn-sm">Filter</button>
       
+      <button class="btn btn-success btn-sm"><i class="fas fa-print"></i> Print</button>
+      
+      <button class="btn btn-outline-primary btn-sm" name="calculate_payroll" id="calculate_payroll" type="submit" data-toggle="tooltip" data-placement="top" title="Calculate"><i class="fas fa-calculator"></i> Re-Caclulate Payroll</button>
      </div>
    </form>
-   <form method="POST" id="sample_form">
-        <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']?>">
-        <button class="btn btn-outline-primary btn-sm" name="calculate_payroll" id="calculate_payroll" type="submit" data-toggle="tooltip" data-placement="top" title="Calculate"><i class="fas fa-calculator"></i> Re-Caclulate Payroll</button>
-      </form>
+   
     </div>
     <div class="col-md-4"></div>
    </div>
@@ -260,7 +259,7 @@ include '../inc/footer.php';
   load_data(1, query);
   }); 
 
-   $('#sample_form').on('submit', function(event){
+   $('#add_deduction_form').on('submit', function(event){
    event.preventDefault();
     $.ajax({
      url:"/d_process",
@@ -290,7 +289,7 @@ include '../inc/footer.php';
    if(percentage > 100)
    {
     clearInterval(timer);
-    $('#sample_form')[0].reset();
+    $('#add_deduction_form')[0].reset();
     $('#process').css('display', 'none');
     $('.progress-bar').css('width', '0%');
     $('#calculate_payroll').attr('disabled', false);
@@ -305,4 +304,3 @@ include '../inc/footer.php';
  });
  
 </script>
-

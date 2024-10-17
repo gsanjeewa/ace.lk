@@ -140,7 +140,7 @@ include '../inc/header.php';
                       <select class="form-control select2" style="width: 100%;" name="merge_id" id="merge_id">
                         <option value="">Select Institution</option>
                         <?php
-                        $query="SELECT b.department_id, b.department_name, b.department_location FROM d_shifts_rate a INNER JOIN department b ON a.department_id=b.department_id WHERE a.status!=1 ORDER BY b.department_name ASC";
+                        $query="SELECT department_id, department_name, department_location FROM department WHERE department_status!=1 ORDER BY department_name ASC";
                         $statement = $connect->prepare($query);
                         $statement->execute();
                         $result = $statement->fetchAll();
@@ -157,7 +157,7 @@ include '../inc/header.php';
                       <label for="department_id">Institution</label>
                       <select class="form-control select2" style="width: 100%;" name="department_id[]" id="department_id" multiple>
                         <!-- <?php
-                        $query="SELECT department_id, department_name, department_location FROM department ORDER BY department_name ASC";
+                        $query="SELECT department_id, department_name, department_location FROM department WHERE department_status!=1 ORDER BY department_name ASC";
                         $statement = $connect->prepare($query);
                         $statement->execute();
                         $result = $statement->fetchAll();

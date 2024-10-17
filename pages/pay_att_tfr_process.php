@@ -1,8 +1,7 @@
 <?php
 
-//process.php
 include 'config.php';
-/*$connect = new PDO("mysql:host=localhost; dbname=testing", "root", "");*/
+
 $connect = pdoConnection();
 if((isset($_POST["effective_date"])) && (isset($_POST["ins_id"]))):
   $effective_date = date("Y-m", strtotime($_POST['effective_date']));
@@ -38,7 +37,7 @@ $delete_permision = array(
     //-----------------Attendance------------------------//
 
     $total_array=array();
-      $statement = $connect->prepare("SELECT a.employee_id, a.position_id, a.start_date, a.end_date, a.poya_day, a.m_day, a.m_ot_hrs, a.extra_ot_hrs, c.shifts, COALESCE(sum(a.no_of_shifts),'0') AS total_shifts FROM attendance a LEFT JOIN d_department_merge b ON a.department_id=b.department_id INNER JOIN d_shifts_rate c ON b.merge_id=c.department_id WHERE b.merge_id='".$_POST["ins_id"]."' AND DATE_FORMAT(a.start_date,'%Y-%m') = '".$effective_date."' GROUP BY a.employee_id");
+      $statement = $connect->prepare("SELECT a.employee_id, a.position_id, a.start_date, a.end_date, a.poya_day, a.m_day, a.m_ot_hrs, a.extra_ot_hrs, COALESCE(sum(a.no_of_shifts),'0') AS total_shifts FROM attendance a INNER JOIN d_department_merge b ON a.department_id=b.department_id WHERE b.merge_id='".$_POST["ins_id"]."' AND DATE_FORMAT(a.start_date,'%Y-%m') = '".$effective_date."' GROUP BY a.employee_id");
       $statement->execute();
       $result = $statement->fetchAll();
 
@@ -46,88 +45,70 @@ $delete_permision = array(
             
         foreach($result as $row):
 
-          $total_array[]=array('employee_id'=>$row['employee_id'],"position_id"=>$row['position_id'],"start_date"=>$row['start_date'],"end_date"=>$row['end_date'],"poya_day"=>$row['poya_day'],"m_day"=>$row['m_day'],"m_ot_hrs"=>$row['m_ot_hrs'],"extra_ot_hrs"=>$row['extra_ot_hrs'],"shifts"=>$row['shifts'],"total_shifts"=>$row['total_shifts']);
+          $total_array[]=array('employee_id'=>$row['employee_id'],"position_id"=>$row['position_id'],"start_date"=>$row['start_date'],"end_date"=>$row['end_date'],"poya_day"=>$row['poya_day'],"m_day"=>$row['m_day'],"m_ot_hrs"=>$row['m_ot_hrs'],"extra_ot_hrs"=>$row['extra_ot_hrs'],"total_shifts"=>$row['total_shifts']);
           
         endforeach;
 
       else:
 
-        $statement = $connect->prepare("SELECT a.employee_id, a.department_id, a.position_id, a.start_date, a.end_date, a.poya_day, a.m_day, a.m_ot_hrs, a.extra_ot_hrs, b.shifts, COALESCE(sum(a.no_of_shifts),'0') AS total_shifts FROM attendance a 
-          INNER JOIN d_shifts_rate b ON a.department_id=b.department_id
-          WHERE DATE_FORMAT(a.start_date,'%Y-%m') = '".$effective_date."' AND a.department_id = '".$_POST["ins_id"]."' GROUP BY a.employee_id");
+        $statement = $connect->prepare("SELECT employee_id, department_id, position_id, start_date, end_date, poya_day, m_day, m_ot_hrs, extra_ot_hrs, COALESCE(sum(no_of_shifts),'0') AS total_shifts FROM attendance           
+          WHERE DATE_FORMAT(start_date,'%Y-%m') = '".$effective_date."' AND department_id = '".$_POST["ins_id"]."' GROUP BY employee_id");
         $statement->execute();
         $result = $statement->fetchAll();
 
         foreach($result as $row):
 
-          $total_array[]=array('employee_id'=>$row['employee_id'],"position_id"=>$row['position_id'],"start_date"=>$row['start_date'],"end_date"=>$row['end_date'],"poya_day"=>$row['poya_day'],"m_day"=>$row['m_day'],"m_ot_hrs"=>$row['m_ot_hrs'],"extra_ot_hrs"=>$row['extra_ot_hrs'],"shifts"=>$row['shifts'],"total_shifts"=>$row['total_shifts']);
+          $total_array[]=array('employee_id'=>$row['employee_id'],"position_id"=>$row['position_id'],"start_date"=>$row['start_date'],"end_date"=>$row['end_date'],"poya_day"=>$row['poya_day'],"m_day"=>$row['m_day'],"m_ot_hrs"=>$row['m_ot_hrs'],"extra_ot_hrs"=>$row['extra_ot_hrs'],"total_shifts"=>$row['total_shifts']);
 
         endforeach;
 
       endif;
 
-      foreach($total_array as $row): 
+      foreach($total_array as $row):
 
-      	$month= date('F', strtotime($_POST['effective_date']));                          
-        $statement = $connect->prepare("SELECT shifts FROM shifts WHERE months = '".$month."'");
+        //------------------shift details-----------------------//
+        $statement = $connect->prepare("SELECT a.shifts FROM d_shifts_rate_max a INNER JOIN attendance b ON a.department_id = b.department_id AND a.position_id = b.position_id WHERE b.start_date = '".$row['start_date']."' AND b.end_date = '".$row['end_date']."' AND a.department_id = '".$_POST["ins_id"]."' AND a.status=0 ORDER BY a.id DESC LIMIT 1");
         $statement->execute();
         $result = $statement->fetchAll();
-        foreach($result as $shifts):
-          $dm_new = $shifts['shifts'];
-        endforeach;
+        
+        if ($statement->rowCount()>0):
+          foreach($result as $row_shifts):
+            $dm_new=$row_shifts['shifts'];
+          endforeach;
+        
+        else:
 
-        $statement = $connect->prepare("SELECT a.position_id FROM promotions a INNER JOIN (SELECT employee_id, MAX(id) maxid_pro FROM promotions GROUP BY employee_id) b ON a.employee_id = b.employee_id AND a.id = b.maxid_pro WHERE a.employee_id='".$row['employee_id']."'");
-        $statement->execute();
-        $result = $statement->fetchAll();
-        foreach($result as $row_position):
-          
-        endforeach;
+          $month= date('F', strtotime($_POST['effective_date']));                          
+          $statement = $connect->prepare("SELECT shifts FROM shifts WHERE months = '".$month."'");
+          $statement->execute();
+          $result = $statement->fetchAll();
+          foreach($result as $shifts):
+            $dm_new = $shifts['shifts'];
+          endforeach;
 
-      // //------------------shift type-----------------------//
-      // $statement = $connect->prepare("SELECT shifts FROM d_shifts_rate WHERE department_id = '".$_POST["ins_id"]."'");
-      // $statement->execute();
-      // $result = $statement->fetchAll();
-            
-      //   foreach($result as $row_shifts):
-          
-      //   endforeach;
-
-        if ($row['shifts']==1):
-          if ($row['total_shifts'] >= $dm_new) :
-            $total_shifts=$dm_new;
-          else:
-            $total_shifts=$row['total_shifts'];
-          endif;
-        elseif($row['shifts']==2):
-          if ($row['total_shifts'] >= $dm_new) :
-            $total_shifts=$dm_new;
-          else:
-            $total_shifts=$row['total_shifts'];
-          endif;
-        elseif($row['shifts']==3):
-          if ($row['total_shifts'] >= 20) :
-            $total_shifts=20;
-          else:
-            $total_shifts=$row['total_shifts'];
-          endif;
-        elseif($row['shifts']==4):
-          $total_shifts=0;
-        elseif($row['shifts']==5):
-          $total_shifts=$row['total_shifts'];
         endif;
-      
-      if (!empty($_POST['extra_ot'])) {
-        $extra_ot=$row['extra_ot_hrs'];
-      }else{
-        $extra_ot='';
-      }
 
+        if (!empty($_POST['total_shifts'])) {
+          $total_shifts=$row['total_shifts'];
+        }else{
+          if ($row['total_shifts'] >= $dm_new) :
+            $total_shifts=$dm_new;
+          else:
+            $total_shifts=$row['total_shifts'];
+          endif;
+        }
+        
+        if (!empty($_POST['extra_ot'])) {
+          $extra_ot=$row['extra_ot_hrs'];
+        }else{
+          $extra_ot='';
+        }
 
 		$data = array(
       ':id'           => $sno ++,
       ':employee_id'  => $row['employee_id'],
   		':department_id'=> $_POST["ins_id"],
-  		':position_id'  => $row_position['position_id'],
+  		':position_id'  => $row['position_id'],
   		':start_date'   => $row['start_date'],
   		':end_date'     => $row['end_date'],
       ':no_of_shifts' => $total_shifts,
