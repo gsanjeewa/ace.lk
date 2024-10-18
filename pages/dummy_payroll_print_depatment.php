@@ -320,27 +320,10 @@ $sno ++;
 	<tr>
 		<th colspan="7" style="text-align: center;">Total</th>
 		<th style="text-align: center;"><?php if ($total['total_shift'] !=0) : echo $total['total_shift']; else: ; endif;?></th>
-		<th colspan="4"></th>
-		<?php 
-        if ($row_shifts['shifts']==1):
-        	
-        elseif ($row_shifts['shifts']==2):
-        	?>
-        	<th colspan="2"></th>
-        	<?php
-        elseif ($row_shifts['shifts']==3):
-        	?>
-        	<th colspan="6"></th>
-        	<?php
-        elseif ($row_shifts['shifts']==4):
-        	?>
-        	<th colspan="8"></th>
-        	<?php
-        elseif ($row_shifts['shifts']==5):
-    	
-    	endif;
-        ?>
-
+		<th colspan="4"></th>		
+		<th colspan="2"></th>        	
+		<th colspan="6"></th>        	
+		<th colspan="8"></th>
 		<th colspan="4"></th>
 		<th style="text-align: right;"><?php if ($total['total_gross'] !=0) : echo number_format($total['total_gross'],2); else: ; endif;?></th>
 		<th style="text-align: right;"><?php if ($total['total_employee_epf'] !=0) : echo number_format($total['total_employee_epf'],2); else: ; endif;?></th>
