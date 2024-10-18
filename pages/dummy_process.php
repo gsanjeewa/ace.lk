@@ -16,10 +16,10 @@ if(isset($_POST["payroll_id"]))
   $query = "DELETE FROM `d_payroll_items` WHERE `payroll_id` = :payroll_id";
 
   // If filter_institution is provided, add department filter
-  if (isset($_POST["filter_institution"])) {
+  if (isset($_POST["institution"])) {
       $query .= ' AND `department` = :department';
       // Add department to the permission array
-      $delete_permision[':department'] = $_POST['filter_institution'];
+      $delete_permision[':department'] = $_POST['institution'];
   }
 
   // Prepare and execute the query
@@ -57,8 +57,8 @@ if(isset($_POST["payroll_id"]))
       INNER JOIN d_position_pay b ON a.department_id = b.department_id AND a.position_id = b.position_id 
       WHERE a.start_date = '".$date_from."' AND a.end_date = '".$date_to."' AND (a.attendance_status=0 OR a.attendance_status=2)";
 
-    if (isset($_POST["filter_institution"])) {
-      $query .= " AND a.department_id = '".$_POST["filter_institution"]."'";
+    if (isset($_POST["institution"])) {
+      $query .= " AND a.department_id = '".$_POST["institution"]."'";
     }
 
     $statement = $connect->prepare($query);

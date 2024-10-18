@@ -85,10 +85,10 @@ include '../inc/header.php';
 
 
    <div class="row">
-    <div class="col-md-4"></div>
+    <div class="col-md-2"></div>
     <div class="col-md-4">
-      <form method="POST" target="_blank" id="add_deduction_form" action="/dummy/payroll_print_depatment">
-      <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']?>">
+      <form method="POST" target="_blank" id="" action="/dummy/payroll_print_depatment">
+      
      <div class="form-group">
       <div class="input-group date" id="reservationmonth" data-target-input="nearest">
         <input type="text" name="effective_date" id="effective_date" class="form-control datetimepicker-input" data-target="#reservationmonth" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm" data-mask value="<?php echo date("Y-m"); ?>" required/>
@@ -111,14 +111,31 @@ include '../inc/header.php';
      <div class="form-group" align="center">
       <button type="button" name="filter" id="filter" class="btn btn-info btn-sm">Filter</button>
       
-      <button class="btn btn-success btn-sm"><i class="fas fa-print"></i> Print</button>
+      <button class="btn btn-success btn-sm"><i class="fas fa-print"></i> Print</button>     
       
+     </div>
+   </form>
+
+   
+   
+    </div>
+    <div class="col-md-4">
+
+    <form method="POST" target="_blank" id="add_deduction_form" >
+      <input type="hidden" name="payroll_id" value="<?php echo $_GET['view']?>">
+     
+     <div class="form-group">
+      <select name="institution" id="institution" class="form-control select2" required>
+       <option value="">Select Institution</option>
+       <?php echo $institution; ?>
+      </select>
+     </div>
+     <div class="form-group" align="center">
       <button class="btn btn-outline-primary btn-sm" name="calculate_payroll" id="calculate_payroll" type="submit" data-toggle="tooltip" data-placement="top" title="Calculate"><i class="fas fa-calculator"></i> Re-Caclulate Payroll</button>
      </div>
    </form>
-   
     </div>
-    <div class="col-md-4"></div>
+    <div class="col-md-2"></div>
    </div>
    <div class="table-responsive">
     <table id="customer_data" class="table table-bordered table-striped">

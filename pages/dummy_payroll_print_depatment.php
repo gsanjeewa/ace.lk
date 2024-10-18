@@ -118,18 +118,13 @@ foreach($result as $row_address)
         foreach($result as $row_department):
         	echo $row_department['department_name'].' - '.$row_department['department_location'];
         endforeach;
+ 
+        // $statement = $connect->prepare('SELECT * FROM d_half_days
+    	// WHERE department_id="'.$_POST['filter_institution'].'"');
+        // $statement->execute();
+        // if ($statement->rowCount()>0):
 
-
-    	$query_shifts = 'SELECT shifts FROM d_shifts_rate
-    	WHERE department_id="'.$_POST['filter_institution'].'"';
-    	         
-        $statement = $connect->prepare($query_shifts);
-        $statement->execute();
-        $total_data = $statement->rowCount();
-        $result = $statement->fetchAll();
-        foreach($result as $row_shifts):
-
-        endforeach;
+		// endif;
         
 
     	$query = 'SELECT * FROM d_payroll_items a 
@@ -160,25 +155,17 @@ foreach($result as $row_address)
 			        <th>Paid Leave Days</th>
 			        <th>Payment for leave days</th>
 			        <th>Over Time x (1.5)</th>
-			        <?php 
-			        if ($row_shifts['shifts']==1):
-			        	
-			        elseif ($row_shifts['shifts']==2):
-			        	?>
+			        
 			        	<th>Half Days</th>
 				        <th>Half day OT hrs</th>
-				        <?php
-			        elseif ($row_shifts['shifts']==3):
-			        	?>
+				       
 			        	<th>Poya Days</th>
 				        <th>Mercantile Days</th>
 				        <th>Mercantile OT Hrs</th>				        
 				        <th>Poya Day Payment</th>
 			        	<th>Mercantile Payment</th>
 			        	<th>Over Time x (3)</th>			        	
-			        	<?php
-			        elseif ($row_shifts['shifts']==4):
-			        	?>
+			        	
 			        	<th>Poya Days</th>
 				        <th>Mercantile Days</th>
 				        <th>Mercantile OT Hrs</th>				        
@@ -187,11 +174,7 @@ foreach($result as $row_address)
 			        	<th>Over Time x (3)</th>
 			        	<th>Half Days</th>
 				        <th>Half day OT hrs</th>
-			        	<?php
-			        elseif ($row_shifts['shifts']==5):
-			    	
-			    	endif;
-			        ?>
+			        	
 			        
 			        <th>Performance Incentive</th>
 			        <th>For EPF</th>
@@ -294,25 +277,17 @@ foreach($result as $row_address)
 				<td style="text-align: right;"><?php if ($row['p_leave_day_payment'] !=0) : echo number_format($row['p_leave_day_payment'],2); else: ; endif;?></td>
 				<td style="text-align: right;"><?php if ($row['ot_payment'] !=0) : echo number_format($row['ot_payment'],2); else: ; endif;?></td>
 
-				<?php 
-			        if ($row_shifts['shifts']==1):
-			        	
-			        elseif ($row_shifts['shifts']==2):
-			        	?>
+				
 			        	<td style="text-align: right;"><?php if ($row['h_days'] !=0) : echo number_format($row['h_days'],2); else: ; endif;?></td>
 						<td style="text-align: right;"><?php if ($row['h_ot_hrs'] !=0) : echo number_format($row['h_ot_hrs'],2); else: ; endif;?></td>
-			        	<?php
-			        elseif ($row_shifts['shifts']==3):
-						?>
+			        	
 			        	<td style="text-align: right;"><?php if ($row['poya_days'] !=0) : echo number_format($row['poya_days'],2); else:;endif;?></td>
 						<td style="text-align: right;"><?php if ($row['m_days'] !=0) : echo number_format($row['m_days'],2); else: endif;?></td>
 						<td style="text-align: right;"><?php if ($row['m_ot_hrs'] !=0) : echo number_format($row['m_ot_hrs'],2); else: endif;?></td>			
 						<td style="text-align: center;"><?php if ($row['poya_day_payment'] !=0) : echo number_format($row['poya_day_payment'],2); else: ; endif;?></td>
 						<td style="text-align: right;"><?php if ($row['m_payment'] !=0) : echo number_format($row['m_payment'],2); else: ; endif;?></td>
 						<td style="text-align: right;"><?php if ($row['ot_t_payment'] !=0) : echo number_format($row['ot_t_payment'],2); else: ; endif;?></td>
-			        	<?php
-			        elseif ($row_shifts['shifts']==4):
-			        	?>
+			        	
 			        	<td style="text-align: right;"><?php if ($row['poya_days'] !=0) : echo number_format($row['poya_days'],2); else:;endif;?></td>
 						<td style="text-align: right;"><?php if ($row['m_days'] !=0) : echo number_format($row['m_days'],2); else: endif;?></td>
 						<td style="text-align: right;"><?php if ($row['m_ot_hrs'] !=0) : echo number_format($row['m_ot_hrs'],2); else: endif;?></td>			
@@ -321,11 +296,7 @@ foreach($result as $row_address)
 						<td style="text-align: right;"><?php if ($row['ot_t_payment'] !=0) : echo number_format($row['ot_t_payment'],2); else: ; endif;?></td>
 						<td style="text-align: right;"><?php if ($row['h_days'] !=0) : echo number_format($row['h_days'],2); else: ; endif;?></td>
 						<td style="text-align: right;"><?php if ($row['h_ot_hrs'] !=0) : echo number_format($row['h_ot_hrs'],2); else: ; endif;?></td>
-			        	<?php
-			        elseif ($row_shifts['shifts']==5):
-			    	
-			    	endif;
-			        ?>
+			        	
 
 				<td style="text-align: right;"><?php if ($row['incentive'] !=0) : echo number_format($row['incentive'],2); else: ; endif;?></td>
 				<td style="text-align: right;"><?php if ($row['for_epf'] !=0) : echo number_format($row['for_epf'],2); else: ; endif;?></td>
